@@ -4,7 +4,8 @@ import { Server } from 'socket.io';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { connectDB } from './db.js';
-import apiRoutes from './routes/api.js';
+import authRoutes from './routes/authRoutes.js';
+import roomRoutes from './routes/roomRoutes.js';
 import { setupSocket } from './socket.js';
 
 dotenv.config();
@@ -23,11 +24,10 @@ const allowedOrigins = [
 app.use(
   cors({
     origin: (origin, callback) => {
-      // Allow requests with no origin (like mobile apps, curl, or same-origin)
       if (!origin || allowedOrigins.includes(origin) || allowedOrigins.length === 0) {
         return callback(null, true);
       }
-      return callback(null, true); // Permissive CORS for smooth deployment across Vercel & Render
+      return callback(null, true);
     },
     credentials: true,
   })
@@ -36,7 +36,24 @@ app.use(
 app.use(express.json());
 
 // API Routes
-app.use('/api', apiRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/rooms', roomRoutes);
+
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+  res.json({
+    status: 'ok',
+    project: 'CodeTogether',
+    tagline: 'Code • Collaborate • Build Together',
+    version: '1.0.0',
+    timestamp: new Date().toISOString(),
+  });
+});
+
+// Root welcome route
+app.get('/', (req, res) => {
+  res.send('CodeTogether Backend API & WebSocket Server is Running.');
+});
 
 // Socket.IO Setup
 const io = new Server(server, {
@@ -48,11 +65,6 @@ const io = new Server(server, {
 });
 
 setupSocket(io);
-
-// Root route
-app.get('/', (req, res) => {
-  res.send('CodeTogether Backend API & WebSocket Server is Running.');
-});
 
 // Start Server
 async function startServer() {

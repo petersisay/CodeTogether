@@ -1,206 +1,162 @@
 import Message from './models/Message.js';
 import Room from './models/Room.js';
+import { initialRoomData } from './routes/roomRoutes.js';
 
-// In-memory store for active room states, participants, and file contents
-const memoryStore = {
-  rooms: {
-    'ASTU_DreamTeam': {
-      users: new Map(),
-      files: {
-        'App.jsx': `import { useState, useEffect } from 'react';
-import { useSocket } from './hooks/useSocket';
-
-function App() {
-  const [messages, setMessages] = useState([]);
-  const socket = useSocket();
-
-  useEffect(() => {
-    if (socket) {
-      socket.on('message', (data) => {
-        setMessages(prev => [...prev, data]);
-      });
-    }
-
-    return () => {
-      socket?.off('message');
-    };
-  }, [socket]);
-
-  return (
-    <div className="app">
-      <h1>CodeTogether</h1>
-      <p>Real-time coding. Real connections.</p>
-    </div>
-  );
-}
-
-export default App;`,
-        'index.js': `import React from 'react';
-import ReactDOM from 'react-dom/client';
-import App from './App.jsx';
-import './style.css';
-
-const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-);`,
-        'style.css': `/* CodeTogether styles */
-.app {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 100vh;
-  background: #070B14;
-  color: #F8FAFC;
-  font-family: 'Inter', sans-serif;
-}
-
-h1 {
-  font-size: 2.5rem;
-  color: #38BDF8;
-  margin-bottom: 0.5rem;
-}`,
-      },
-      messages: [
-        {
-          id: 1,
-          sender: 'Petros',
-          time: '10:24',
-          text: 'This looks great! 🚀',
-          avatar: '/assets/avatar-petros.png',
-        },
-        {
-          id: 2,
-          sender: 'Habtu',
-          time: '10:25',
-          text: 'I added the new function. Check it out.',
-          avatar: '/assets/avatar-habtu.png',
-        },
-        {
-          id: 3,
-          sender: 'Mekdes',
-          time: '10:26',
-          text: "Nice! Let's test it now. ✅",
-          avatar: '/assets/avatar-mekdes.png',
-        },
-      ],
-    },
-    'Web Development': {
-      users: new Map(),
-      files: {},
-      messages: [],
-    },
-    'React Project': {
-      users: new Map(),
-      files: {},
-      messages: [],
-    },
-    'General Chat': {
-      users: new Map(),
-      files: {},
-      messages: [],
-    },
-  },
-};
+// Map of active rooms -> Map of socket.id -> user info
+const activeRoomSessions = new Map();
 
 export function setupSocket(io) {
   io.on('connection', (socket) => {
     let currentRoom = null;
     let currentUser = null;
+    let currentAvatar = '/assets/avatar-petros.png';
+    let currentFile = 'App.jsx';
 
-    console.log(`[Socket] Client connected: ${socket.id}`);
+    console.log(`[Socket] Connected: ${socket.id}`);
 
-    // Join room
-    socket.on('room:join', async ({ room = 'ASTU_DreamTeam', user = 'Petros' }) => {
+    // Helper to broadcast presence for a room
+    const broadcastPresence = (roomName) => {
+      if (!roomName) return;
+      const roomMap = activeRoomSessions.get(roomName);
+      const participants = [];
+
+      if (roomMap && roomMap.size > 0) {
+        for (const [sId, info] of roomMap.entries()) {
+          participants.push({
+            id: sId,
+            name: info.name,
+            avatar: info.avatar,
+            activity: info.activity || `Editing ${info.currentFile || 'App.jsx'}`,
+            statusColor: 'bg-emerald-400',
+          });
+        }
+      }
+
+      // If room has participants, broadcast real list
+      io.to(roomName).emit('presence:list', {
+        room: roomName,
+        count: participants.length,
+        collaborators: participants,
+      });
+    };
+
+    // 1. JOIN ROOM
+    socket.on('room:join', async ({ room = 'ASTU_DreamTeam', user = 'Petros', avatar, file = 'App.jsx' }) => {
+      // Leave previous room if any
       if (currentRoom) {
         socket.leave(currentRoom);
-        if (memoryStore.rooms[currentRoom]) {
-          memoryStore.rooms[currentRoom].users.delete(socket.id);
-          io.to(currentRoom).emit('presence:update', {
-            room: currentRoom,
-            count: memoryStore.rooms[currentRoom].users.size,
-          });
+        const prevMap = activeRoomSessions.get(currentRoom);
+        if (prevMap) {
+          prevMap.delete(socket.id);
+          broadcastPresence(currentRoom);
         }
       }
 
       currentRoom = room;
       currentUser = user;
+      currentAvatar = avatar || '/assets/avatar-petros.png';
+      currentFile = file;
+
       socket.join(room);
 
-      // Initialize room in memory if not exists
-      if (!memoryStore.rooms[room]) {
-        memoryStore.rooms[room] = { users: new Map(), files: {}, messages: [] };
+      if (!activeRoomSessions.has(room)) {
+        activeRoomSessions.set(room, new Map());
       }
 
-      memoryStore.rooms[room].users.set(socket.id, {
-        id: socket.id,
-        user,
-        joinedAt: new Date(),
+      activeRoomSessions.get(room).set(socket.id, {
+        name: currentUser,
+        avatar: currentAvatar,
+        currentFile,
+        activity: `Editing ${currentFile}`,
       });
 
-      console.log(`[Socket] User '${user}' joined room '${room}' (socket: ${socket.id})`);
+      console.log(`[Socket] User '${currentUser}' joined '${room}' (socket: ${socket.id})`);
 
-      // Broadcast updated count
-      io.to(room).emit('presence:update', {
-        room,
-        count: memoryStore.rooms[room].users.size,
-      });
+      // Broadcast updated presence to everyone in the room
+      broadcastPresence(room);
 
-      // Send initial state to the joining user
+      // Send initial room files and messages to the newly joined client
+      let roomFiles = {};
+      if (initialRoomData[room] && initialRoomData[room].files) {
+        initialRoomData[room].files.forEach((f) => {
+          roomFiles[f.filename] = f.content;
+        });
+      }
+
       socket.emit('room:state', {
         room,
-        files: memoryStore.rooms[room].files,
-        messages: memoryStore.rooms[room].messages,
+        files: roomFiles,
       });
     });
 
-    // Real-time code change
-    socket.on('code:change', async ({ room, file, code }) => {
+    // 2. ACTIVE FILE SWITCH
+    socket.on('file:switch', ({ room, file }) => {
       const targetRoom = room || currentRoom;
       if (!targetRoom) return;
 
-      if (!memoryStore.rooms[targetRoom]) {
-        memoryStore.rooms[targetRoom] = { users: new Map(), files: {}, messages: [] };
+      currentFile = file;
+      const roomMap = activeRoomSessions.get(targetRoom);
+      if (roomMap && roomMap.has(socket.id)) {
+        const userObj = roomMap.get(socket.id);
+        userObj.currentFile = file;
+        userObj.activity = `Editing ${file}`;
+        broadcastPresence(targetRoom);
       }
+    });
 
-      // Update memory store
-      memoryStore.rooms[targetRoom].files[file] = code;
+    // 3. CODE CHANGE SYNC
+    socket.on('code:change', async ({ room, file, code }) => {
+      const targetRoom = room || currentRoom;
+      if (!targetRoom || !file) return;
+
+      // Update in memory cache
+      if (initialRoomData[targetRoom]) {
+        const targetFile = initialRoomData[targetRoom].files.find((f) => f.filename === file);
+        if (targetFile) {
+          targetFile.content = code;
+        } else {
+          initialRoomData[targetRoom].files.push({
+            filename: file,
+            content: code,
+            language: file.endsWith('.css') ? 'css' : 'javascript',
+          });
+        }
+      }
 
       // Broadcast to other collaborators in room
       socket.to(targetRoom).emit('code:update', {
+        room: targetRoom,
         file,
         code,
         sender: currentUser,
       });
 
-      // Optional async save to MongoDB if connected
+      // Update MongoDB asynchronously
       try {
         await Room.findOneAndUpdate(
           { name: targetRoom, 'files.filename': file },
-          { $set: { 'files.$.content': code } },
-          { upsert: false }
+          { $set: { 'files.$.content': code } }
         ).catch(() => {});
       } catch (err) {}
     });
 
-    // Real-time chat message
+    // 4. CHAT MESSAGE SYNC
     socket.on('chat:send', async ({ room, message }) => {
       const targetRoom = room || currentRoom;
       if (!targetRoom || !message) return;
 
-      if (!memoryStore.rooms[targetRoom]) {
-        memoryStore.rooms[targetRoom] = { users: new Map(), files: {}, messages: [] };
+      // Store in memory
+      if (initialRoomData[targetRoom]) {
+        if (!initialRoomData[targetRoom].messages) {
+          initialRoomData[targetRoom].messages = [];
+        }
+        initialRoomData[targetRoom].messages.push(message);
       }
 
-      memoryStore.rooms[targetRoom].messages.push(message);
-
-      // Broadcast to all participants in the room except sender (sender adds locally)
+      // Broadcast to everyone else in room
       socket.to(targetRoom).emit('chat:message', message);
 
-      // Optional async save to MongoDB
+      // Persist to MongoDB
       try {
         await Message.create({
           room: targetRoom,
@@ -212,15 +168,26 @@ export function setupSocket(io) {
       } catch (err) {}
     });
 
-    // Handle disconnect
+    // 5. FILE CREATED OR DELETED
+    socket.on('file:create', ({ room, file }) => {
+      const targetRoom = room || currentRoom;
+      socket.to(targetRoom).emit('file:created', file);
+    });
+
+    socket.on('file:delete', ({ room, filename }) => {
+      const targetRoom = room || currentRoom;
+      socket.to(targetRoom).emit('file:deleted', { filename });
+    });
+
+    // 6. DISCONNECT
     socket.on('disconnect', () => {
-      console.log(`[Socket] Client disconnected: ${socket.id}`);
-      if (currentRoom && memoryStore.rooms[currentRoom]) {
-        memoryStore.rooms[currentRoom].users.delete(socket.id);
-        io.to(currentRoom).emit('presence:update', {
-          room: currentRoom,
-          count: memoryStore.rooms[currentRoom].users.size,
-        });
+      console.log(`[Socket] Disconnected: ${socket.id}`);
+      if (currentRoom) {
+        const roomMap = activeRoomSessions.get(currentRoom);
+        if (roomMap) {
+          roomMap.delete(socket.id);
+          broadcastPresence(currentRoom);
+        }
       }
     });
   });
