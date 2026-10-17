@@ -1,8 +1,11 @@
 import express from 'express';
+import mongoose from 'mongoose';
 import Room from '../models/Room.js';
 import Message from '../models/Message.js';
+import { authenticateToken } from '../middleware/auth.js';
 
 const router = express.Router();
+
 
 // Default seed rooms and files matching reference image
 export const initialRoomData = {
@@ -148,11 +151,19 @@ h1 {
 // 1. GET ALL ROOMS
 router.get('/', async (req, res) => {
   try {
-    const dbRooms = await Room.find().lean();
-    if (dbRooms && dbRooms.length > 0) {
-      return res.json(dbRooms);
+    const isConnected = mongoose.connection.readyState === 1;
+    if (isConnected) {
+      const dbRooms = await Room.find().lean();
+      if (dbRooms && dbRooms.length > 0) {
+        return res.json(dbRooms);
+      }
     }
-  } catch (err) {}
+  } catch (err) {
+    console.error('[Rooms GET Error]:', err);
+    if (process.env.NODE_ENV === 'production') {
+      return res.status(500).json({ error: 'Failed to retrieve rooms from database' });
+    }
+  }
 
   // Fallback memory list
   const list = Object.values(initialRoomData).map((r) => ({
@@ -160,13 +171,13 @@ router.get('/', async (req, res) => {
     description: r.description,
     dotColor: r.dotColor,
     onlineCount: r.name === 'ASTU_DreamTeam' ? 3 : r.name === 'Web Development' ? 2 : r.name === 'React Project' ? 1 : 0,
-    fileCount: r.files.length,
+    fileCount: r.files ? r.files.length : 0,
   }));
   res.json(list);
 });
 
-// 2. CREATE A NEW ROOM
-router.post('/', async (req, res) => {
+// 2. CREATE A NEW ROOM (Authenticated)
+router.post('/', authenticateToken, async (req, res) => {
   try {
     const { name, description } = req.body;
 
@@ -175,9 +186,9 @@ router.post('/', async (req, res) => {
     }
 
     const cleanName = name.trim().replace(/\s+/g, '_');
+    const isConnected = mongoose.connection.readyState === 1;
 
-    // Check DB
-    try {
+    if (isConnected) {
       const existing = await Room.findOne({ name: cleanName });
       if (existing) {
         return res.status(409).json({ error: 'Room with this name already exists' });
@@ -187,6 +198,8 @@ router.post('/', async (req, res) => {
         name: cleanName,
         description: description || 'Collaborative coding room',
         dotColor: 'bg-blue-400',
+        creator: req.user.username,
+        authorizedUsers: [req.user.username],
         files: [
           {
             filename: 'main.js',
@@ -197,30 +210,37 @@ router.post('/', async (req, res) => {
       });
 
       return res.status(201).json(newRoom);
-    } catch (dbErr) {
-      // Memory fallback
-      if (initialRoomData[cleanName]) {
-        return res.status(409).json({ error: 'Room with this name already exists' });
-      }
-
-      initialRoomData[cleanName] = {
-        name: cleanName,
-        description: description || 'Collaborative coding room',
-        dotColor: 'bg-blue-400',
-        files: [
-          {
-            filename: 'main.js',
-            language: 'javascript',
-            content: `// Welcome to ${cleanName}!\nconsole.log("Ready to code together!");\n`,
-          },
-        ],
-        messages: [],
-      };
-
-      return res.status(201).json(initialRoomData[cleanName]);
     }
+
+    if (process.env.NODE_ENV === 'production') {
+      return res.status(503).json({ error: 'Database unavailable in production' });
+    }
+
+    // Dev fallback
+    if (initialRoomData[cleanName]) {
+      return res.status(409).json({ error: 'Room with this name already exists' });
+    }
+
+    initialRoomData[cleanName] = {
+      name: cleanName,
+      description: description || 'Collaborative coding room',
+      dotColor: 'bg-blue-400',
+      creator: req.user.username,
+      authorizedUsers: [req.user.username],
+      files: [
+        {
+          filename: 'main.js',
+          language: 'javascript',
+          content: `// Welcome to ${cleanName}!\nconsole.log("Ready to code together!");\n`,
+        },
+      ],
+      messages: [],
+    };
+
+    return res.status(201).json(initialRoomData[cleanName]);
   } catch (error) {
-    res.status(500).json({ error: 'Failed to create room' });
+    console.error('[Room Create Error]:', error);
+    res.status(500).json({ error: error.message || 'Failed to create room' });
   }
 });
 
@@ -229,11 +249,16 @@ router.get('/:name', async (req, res) => {
   const { name } = req.params;
 
   try {
-    const dbRoom = await Room.findOne({ name }).lean();
-    if (dbRoom) {
-      return res.json(dbRoom);
+    const isConnected = mongoose.connection.readyState === 1;
+    if (isConnected) {
+      const dbRoom = await Room.findOne({ name }).lean();
+      if (dbRoom) {
+        return res.json(dbRoom);
+      }
     }
-  } catch (err) {}
+  } catch (err) {
+    console.error('[Room Details Error]:', err);
+  }
 
   if (initialRoomData[name]) {
     return res.json(initialRoomData[name]);
@@ -256,8 +281,8 @@ router.get('/:name', async (req, res) => {
   res.json(dynamicRoom);
 });
 
-// 4. CREATE NEW FILE IN ROOM
-router.post('/:name/files', async (req, res) => {
+// 4. CREATE NEW FILE IN ROOM (Authenticated)
+router.post('/:name/files', authenticateToken, async (req, res) => {
   const { name } = req.params;
   const { filename, content } = req.body;
 
@@ -268,21 +293,29 @@ router.post('/:name/files', async (req, res) => {
   const cleanFilename = filename.trim();
 
   try {
-    const dbRoom = await Room.findOne({ name });
-    if (dbRoom) {
-      const exists = dbRoom.files.some((f) => f.filename === cleanFilename);
-      if (exists) {
-        return res.status(409).json({ error: 'File already exists in this room' });
+    const isConnected = mongoose.connection.readyState === 1;
+    if (isConnected) {
+      const dbRoom = await Room.findOne({ name });
+      if (dbRoom) {
+        const exists = dbRoom.files.some((f) => f.filename === cleanFilename);
+        if (exists) {
+          return res.status(409).json({ error: 'File already exists in this room' });
+        }
+        dbRoom.files.push({
+          filename: cleanFilename,
+          content: content || '',
+          language: cleanFilename.endsWith('.css') ? 'css' : 'javascript',
+        });
+        await dbRoom.save();
+        return res.status(201).json({ message: 'File created', file: dbRoom.files[dbRoom.files.length - 1] });
       }
-      dbRoom.files.push({
-        filename: cleanFilename,
-        content: content || '',
-        language: cleanFilename.endsWith('.css') ? 'css' : 'javascript',
-      });
-      await dbRoom.save();
-      return res.status(201).json({ message: 'File created', file: dbRoom.files[dbRoom.files.length - 1] });
     }
-  } catch (err) {}
+  } catch (err) {
+    console.error('[File Create DB Error]:', err);
+    if (process.env.NODE_ENV === 'production') {
+      return res.status(500).json({ error: 'Failed to create file in database' });
+    }
+  }
 
   if (initialRoomData[name]) {
     const exists = initialRoomData[name].files.some((f) => f.filename === cleanFilename);
@@ -301,22 +334,30 @@ router.post('/:name/files', async (req, res) => {
   res.status(404).json({ error: 'Room not found' });
 });
 
-// 5. UPDATE / SAVE FILE CONTENT
-router.put('/:name/files/:filename', async (req, res) => {
+// 5. UPDATE / SAVE FILE CONTENT (Authenticated)
+router.put('/:name/files/:filename', authenticateToken, async (req, res) => {
   const { name, filename } = req.params;
   const { content } = req.body;
 
   try {
-    const dbRoom = await Room.findOne({ name });
-    if (dbRoom) {
-      const file = dbRoom.files.find((f) => f.filename === filename);
-      if (file) {
-        file.content = content;
-        await dbRoom.save();
-        return res.json({ message: 'File updated successfully', filename });
+    const isConnected = mongoose.connection.readyState === 1;
+    if (isConnected) {
+      const dbRoom = await Room.findOne({ name });
+      if (dbRoom) {
+        const file = dbRoom.files.find((f) => f.filename === filename);
+        if (file) {
+          file.content = content;
+          await dbRoom.save();
+          return res.json({ message: 'File updated successfully', filename });
+        }
       }
     }
-  } catch (err) {}
+  } catch (err) {
+    console.error('[File Update DB Error]:', err);
+    if (process.env.NODE_ENV === 'production') {
+      return res.status(500).json({ error: 'Failed to update file in database' });
+    }
+  }
 
   if (initialRoomData[name]) {
     const file = initialRoomData[name].files.find((f) => f.filename === filename);
@@ -329,18 +370,26 @@ router.put('/:name/files/:filename', async (req, res) => {
   res.status(404).json({ error: 'File not found' });
 });
 
-// 6. DELETE FILE FROM ROOM
-router.delete('/:name/files/:filename', async (req, res) => {
+// 6. DELETE FILE FROM ROOM (Authenticated)
+router.delete('/:name/files/:filename', authenticateToken, async (req, res) => {
   const { name, filename } = req.params;
 
   try {
-    const dbRoom = await Room.findOne({ name });
-    if (dbRoom) {
-      dbRoom.files = dbRoom.files.filter((f) => f.filename !== filename);
-      await dbRoom.save();
-      return res.json({ message: 'File deleted successfully', filename });
+    const isConnected = mongoose.connection.readyState === 1;
+    if (isConnected) {
+      const dbRoom = await Room.findOne({ name });
+      if (dbRoom) {
+        dbRoom.files = dbRoom.files.filter((f) => f.filename !== filename);
+        await dbRoom.save();
+        return res.json({ message: 'File deleted successfully', filename });
+      }
     }
-  } catch (err) {}
+  } catch (err) {
+    console.error('[File Delete DB Error]:', err);
+    if (process.env.NODE_ENV === 'production') {
+      return res.status(500).json({ error: 'Failed to delete file from database' });
+    }
+  }
 
   if (initialRoomData[name]) {
     initialRoomData[name].files = initialRoomData[name].files.filter((f) => f.filename !== filename);
@@ -355,40 +404,56 @@ router.get('/:name/messages', async (req, res) => {
   const { name } = req.params;
 
   try {
-    const messages = await Message.find({ room: name }).sort({ createdAt: 1 }).lean();
-    if (messages && messages.length > 0) {
-      return res.json(messages);
+    const isConnected = mongoose.connection.readyState === 1;
+    if (isConnected) {
+      const messages = await Message.find({ room: name }).sort({ createdAt: 1 }).lean();
+      if (messages && messages.length > 0) {
+        return res.json(messages);
+      }
     }
-  } catch (err) {}
+  } catch (err) {
+    console.error('[Get Messages DB Error]:', err);
+  }
 
   const memMessages = (initialRoomData[name] && initialRoomData[name].messages) || [];
   res.json(memMessages);
 });
 
-// 8. POST CHAT MESSAGE
-router.post('/:name/messages', async (req, res) => {
+// 8. POST CHAT MESSAGE (Authenticated, with sender derived from token)
+router.post('/:name/messages', authenticateToken, async (req, res) => {
   const { name } = req.params;
-  const { sender, text, avatar, time } = req.body;
+  const { text, avatar, time } = req.body;
 
-  if (!sender || !text) {
-    return res.status(400).json({ error: 'Sender and message text are required' });
+  if (!text || !text.trim()) {
+    return res.status(400).json({ error: 'Message text is required' });
   }
 
+  const senderName = req.user.username;
+  const senderAvatar = req.user.avatar || avatar || '/assets/avatar-petros.png';
   const now = new Date();
   const timeStr = time || `${now.getHours()}:${String(now.getMinutes()).padStart(2, '0')}`;
 
   const messageObj = {
     id: Date.now(),
     room: name,
-    sender,
-    text,
-    avatar: avatar || '/assets/avatar-petros.png',
+    sender: senderName,
+    text: text.trim(),
+    avatar: senderAvatar,
     time: timeStr,
   };
 
   try {
-    await Message.create(messageObj);
-  } catch (err) {}
+    const isConnected = mongoose.connection.readyState === 1;
+    if (isConnected) {
+      const created = await Message.create(messageObj);
+      return res.status(201).json(created);
+    }
+  } catch (err) {
+    console.error('[Message Post DB Error]:', err);
+    if (process.env.NODE_ENV === 'production') {
+      return res.status(500).json({ error: 'Failed to persist message' });
+    }
+  }
 
   if (initialRoomData[name]) {
     if (!initialRoomData[name].messages) {
@@ -401,3 +466,4 @@ router.post('/:name/messages', async (req, res) => {
 });
 
 export default router;
+

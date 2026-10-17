@@ -12,6 +12,9 @@ import {
   Trash2,
   Save,
   Check,
+  Video,
+  Phone,
+  AlertTriangle,
 } from 'lucide-react';
 import highlightCode from './SyntaxHighlighter.jsx';
 import CreateRoomModal from './CreateRoomModal.jsx';
@@ -24,6 +27,7 @@ export default function WorkspaceWindow({
   connected,
   currentUser,
   onOpenAuth,
+  onNavigateToMeeting,
 }) {
   const [activeTab, setActiveTab] = useState('App.jsx');
   const [files, setFiles] = useState({});
@@ -35,6 +39,7 @@ export default function WorkspaceWindow({
   const [isCreateRoomOpen, setIsCreateRoomOpen] = useState(false);
   const [isCreateFileOpen, setIsCreateFileOpen] = useState(false);
   const [savedStatus, setSavedStatus] = useState(false);
+  const [conflictAlert, setConflictAlert] = useState(null);
 
   const chatScrollRef = useRef(null);
   const textareaRef = useRef(null);
@@ -42,6 +47,14 @@ export default function WorkspaceWindow({
   const saveTimeoutRef = useRef(null);
 
   const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
+
+  const getAuthHeaders = () => {
+    const token = localStorage.getItem('codetogether_token');
+    return {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    };
+  };
 
   // 1. Fetch Rooms List
   const fetchRooms = async () => {
@@ -74,7 +87,6 @@ export default function WorkspaceWindow({
               fileMap[f.filename] = f.content;
             });
             setFiles(fileMap);
-            // Default to first file or keep tab if exists
             if (!fileMap[activeTab]) {
               setActiveTab(roomData.files[0].filename);
             }
@@ -106,17 +118,32 @@ export default function WorkspaceWindow({
       }
     };
 
-    // Receive live code updates from other users
-    const handleCodeUpdate = ({ file, code }) => {
+    // Receive live code updates from other users with collision awareness
+    const handleCodeUpdate = ({ file, code, version, sender, hasCollision }) => {
       setFiles((prev) => ({
         ...prev,
         [file]: code,
       }));
+      if (hasCollision) {
+        setConflictAlert(`Concurrent edit synchronized from ${sender} on ${file}.`);
+        setTimeout(() => setConflictAlert(null), 4000);
+      }
     };
 
-    // Receive real-time chat messages
+    // Receive real-time chat messages (deduplicated)
     const handleChatMessage = (msg) => {
-      setChatMessages((prev) => [...prev, msg]);
+      setChatMessages((prev) => {
+        if (
+          prev.some(
+            (m) =>
+              m.id === msg.id ||
+              (m.sender === msg.sender && m.text === msg.text && m.time === msg.time)
+          )
+        ) {
+          return prev;
+        }
+        return [...prev, msg];
+      });
     };
 
     // Receive file created/deleted by collaborators
@@ -172,17 +199,21 @@ export default function WorkspaceWindow({
       });
     }
 
-    // Debounced auto-save to backend API
+    // Debounced auto-save to backend API with auth header
     if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
     saveTimeoutRef.current = setTimeout(async () => {
       try {
-        await fetch(`${backendUrl}/api/rooms/${activeRoom}/files/${activeTab}`, {
+        const res = await fetch(`${backendUrl}/api/rooms/${activeRoom}/files/${activeTab}`, {
           method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
+          headers: getAuthHeaders(),
           body: JSON.stringify({ content: newCode }),
         });
-        setSavedStatus(true);
-        setTimeout(() => setSavedStatus(false), 2000);
+        if (res.ok) {
+          setSavedStatus(true);
+          setTimeout(() => setSavedStatus(false), 2000);
+        } else if (res.status === 401) {
+          onOpenAuth?.();
+        }
       } catch (err) {}
     }, 1000);
   };
@@ -202,50 +233,30 @@ export default function WorkspaceWindow({
     }
   };
 
-  // 7. Send chat message
-  const handleSendMessage = async (e) => {
+  // 7. Send chat message (Single dispatch via authenticated socket to avoid duplicate DB records)
+  const handleSendMessage = (e) => {
     e?.preventDefault();
     if (!inputText.trim()) return;
-
-    const senderName = currentUser ? currentUser.username : 'Petros';
-    const senderAvatar = currentUser ? currentUser.avatar : '/assets/avatar-petros.png';
-    const now = new Date();
-    const timeStr = `${now.getHours()}:${String(now.getMinutes()).padStart(2, '0')}`;
-
-    const newMsg = {
-      id: Date.now(),
-      sender: senderName,
-      time: timeStr,
-      text: inputText.trim(),
-      avatar: senderAvatar,
-    };
-
-    setChatMessages((prev) => [...prev, newMsg]);
-    setInputText('');
-
-    // Emit socket event
-    if (socket && socket.connected) {
-      socket.emit('chat:send', { room: activeRoom, message: newMsg });
+    if (!currentUser) {
+      onOpenAuth?.();
+      return;
     }
 
-    // Persist to backend API
-    try {
-      await fetch(`${backendUrl}/api/rooms/${activeRoom}/messages`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newMsg),
-      });
-    } catch (err) {}
+    if (socket && socket.connected) {
+      socket.emit('chat:send', { room: activeRoom, text: inputText.trim() });
+    }
+    setInputText('');
   };
 
   // 8. Delete file
   const handleDeleteFile = async (e, filename) => {
     e.stopPropagation();
-    if (Object.keys(files).length <= 1) return; // Prevent deleting the last file
+    if (Object.keys(files).length <= 1) return;
 
     try {
       await fetch(`${backendUrl}/api/rooms/${activeRoom}/files/${filename}`, {
         method: 'DELETE',
+        headers: getAuthHeaders(),
       });
 
       setFiles((prev) => {
@@ -312,8 +323,28 @@ export default function WorkspaceWindow({
           <ChevronDown className="w-3 h-3 text-slate-400 ml-0.5" />
         </div>
 
-        {/* Right: Live indicator + Collaborators + User Login */}
-        <div className="flex items-center gap-2.5">
+        {/* Right: Call Actions + Live indicator + Collaborators + User Login */}
+        <div className="flex items-center gap-2">
+          {/* Quick Voice & Video Call Action Buttons */}
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => onNavigateToMeeting?.(activeRoom, 'audio')}
+              title="Start Voice Call"
+              className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-blue-950/70 border border-blue-700/50 text-[10px] text-sky-300 hover:text-white hover:bg-blue-900/60 cursor-pointer transition-all"
+            >
+              <Phone className="w-3 h-3 text-sky-400" />
+              <span className="hidden md:inline">Voice</span>
+            </button>
+            <button
+              onClick={() => onNavigateToMeeting?.(activeRoom, 'video')}
+              title="Join Video Meeting"
+              className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-blue-600/40 border border-blue-500/50 text-[10px] text-sky-200 hover:text-white hover:bg-blue-600/60 cursor-pointer transition-all"
+            >
+              <Video className="w-3 h-3 text-cyan-300" />
+              <span className="hidden md:inline">Video</span>
+            </button>
+          </div>
+
           <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-950/40 border border-emerald-500/30 text-[10px] text-emerald-400 font-medium">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
             <span>Live</span>
@@ -482,6 +513,14 @@ export default function WorkspaceWindow({
               </div>
             )}
           </div>
+
+          {/* Conflict Alert Banner */}
+          {conflictAlert && (
+            <div className="bg-amber-950/80 border-b border-amber-500/40 px-3 py-1 text-[11px] text-amber-200 flex items-center gap-2 select-none">
+              <AlertTriangle className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+              <span>{conflictAlert}</span>
+            </div>
+          )}
 
           {/* Code Canvas with Line Numbers & Syntax Highlighted View */}
           <div className="relative flex-1 flex p-2.5 overflow-hidden font-code text-xs leading-5">
