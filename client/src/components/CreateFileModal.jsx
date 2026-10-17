@@ -18,9 +18,13 @@ export default function CreateFileModal({ isOpen, onClose, onFileCreated, active
     setLoading(true);
 
     try {
+      const token = localStorage.getItem('codetogether_token');
       const res = await fetch(`${backendUrl}/api/rooms/${activeRoom}/files`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
         body: JSON.stringify({ filename: filename.trim(), content: `// ${filename.trim()}\n` }),
       });
 

@@ -19,9 +19,13 @@ export default function CreateRoomModal({ isOpen, onClose, onRoomCreated }) {
     setLoading(true);
 
     try {
+      const token = localStorage.getItem('codetogether_token');
       const res = await fetch(`${backendUrl}/api/rooms`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
         body: JSON.stringify({ name: name.trim(), description: description.trim() }),
       });
 

@@ -20,6 +20,19 @@ const roomSchema = new mongoose.Schema(
       type: String,
       default: 'bg-emerald-400',
     },
+    creator: {
+      type: String,
+      default: 'system',
+    },
+    isPrivate: {
+      type: Boolean,
+      default: false,
+    },
+    authorizedUsers: [
+      {
+        type: String,
+      },
+    ],
     files: [
       {
         filename: String,
