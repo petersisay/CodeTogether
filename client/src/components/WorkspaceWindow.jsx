@@ -566,8 +566,8 @@ export default function WorkspaceWindow({
             </div>
 
             <div className="space-y-2">
-              {displayCollaborators.map((user) => (
-                <div key={user.name + user.activity} className="flex items-center gap-2">
+              {displayCollaborators.map((user, idx) => (
+                <div key={user.socketId || `${user.name}-${user.activity || ''}-${idx}`} className="flex items-center gap-2">
                   <div className="relative">
                     <img
                       src={user.avatar}
