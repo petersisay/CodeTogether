@@ -9,6 +9,7 @@ import TechStack from './components/TechStack.jsx';
 import ArchitectureDiagram from './components/ArchitectureDiagram.jsx';
 import LearningGoalsFooter from './components/LearningGoalsFooter.jsx';
 import AuthModal from './components/AuthModal.jsx';
+import MeetingRoom from './components/MeetingRoom.jsx';
 
 export default function App() {
   const [activeRoom, setActiveRoom] = useState('ASTU_DreamTeam');
@@ -16,27 +17,39 @@ export default function App() {
   const [connected, setConnected] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
+  const [currentPath, setCurrentPath] = useState(() => window.location.pathname + window.location.search);
 
-  // Initialize stored user if any
+  // 1. Initialize user from validated localStorage credentials
   useEffect(() => {
     try {
-      const stored = localStorage.getItem('codetogether_user');
-      if (stored) {
-        setCurrentUser(JSON.parse(stored));
+      const storedUser = localStorage.getItem('codetogether_user');
+      const storedToken = localStorage.getItem('codetogether_token');
+      if (storedUser && storedToken) {
+        setCurrentUser(JSON.parse(storedUser));
       } else {
-        // Default demonstration user session
-        setCurrentUser({
-          username: 'Petros',
-          avatar: '/assets/avatar-petros.png',
-        });
+        setCurrentUser(null);
       }
-    } catch (e) {}
+    } catch (e) {
+      setCurrentUser(null);
+    }
   }, []);
 
-  // Initialize Socket.IO connection
+  // 2. Browser History / URL routing listener
+  useEffect(() => {
+    const handlePopState = () => {
+      setCurrentPath(window.location.pathname + window.location.search);
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
+  // 3. Initialize Socket.IO connection with JWT token
   useEffect(() => {
     const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
+    const token = localStorage.getItem('codetogether_token');
+
     const socketInstance = io(backendUrl, {
+      auth: { token },
       transports: ['websocket', 'polling'],
       autoConnect: true,
       reconnectionAttempts: 10,
@@ -45,13 +58,21 @@ export default function App() {
 
     socketInstance.on('connect', () => {
       setConnected(true);
-      const name = currentUser ? currentUser.username : 'Petros';
-      const av = currentUser ? currentUser.avatar : '/assets/avatar-petros.png';
-      socketInstance.emit('room:join', { room: activeRoom, user: name, avatar: av });
+      const currentToken = localStorage.getItem('codetogether_token');
+      if (currentToken) {
+        socketInstance.emit('auth:authenticate', { token: currentToken });
+        socketInstance.emit('room:join', { room: activeRoom });
+      }
     });
 
     socketInstance.on('disconnect', () => {
       setConnected(false);
+    });
+
+    socketInstance.on('auth:error', () => {
+      localStorage.removeItem('codetogether_token');
+      localStorage.removeItem('codetogether_user');
+      setCurrentUser(null);
     });
 
     setSocket(socketInstance);
@@ -61,12 +82,10 @@ export default function App() {
     };
   }, []);
 
-  // When room or user changes, update socket room
+  // 4. Update room when activeRoom or currentUser changes
   useEffect(() => {
-    if (socket && socket.connected) {
-      const name = currentUser ? currentUser.username : 'Petros';
-      const av = currentUser ? currentUser.avatar : '/assets/avatar-petros.png';
-      socket.emit('room:join', { room: activeRoom, user: name, avatar: av });
+    if (socket && socket.connected && currentUser) {
+      socket.emit('room:join', { room: activeRoom });
     }
   }, [activeRoom, currentUser, socket]);
 
@@ -82,14 +101,53 @@ export default function App() {
 
   const handleAuthSuccess = (user, token) => {
     setCurrentUser(user);
-    if (socket && socket.connected) {
-      socket.emit('room:join', {
-        room: activeRoom,
-        user: user.username,
-        avatar: user.avatar,
-      });
+    if (socket) {
+      socket.auth = { token };
+      socket.emit('auth:authenticate', { token });
+      socket.emit('room:join', { room: activeRoom });
     }
   };
+
+  const handleNavigateToMeeting = (meetingId, mode = 'video') => {
+    if (!currentUser) {
+      setIsAuthOpen(true);
+      return;
+    }
+    const newPath = `/meeting/${encodeURIComponent(meetingId)}?mode=${mode}`;
+    window.history.pushState({}, '', newPath);
+    setCurrentPath(newPath);
+  };
+
+  const handleReturnToWorkspace = () => {
+    window.history.pushState({}, '', '/');
+    setCurrentPath('/');
+  };
+
+  // Route: /meeting/:meetingId
+  if (currentPath.startsWith('/meeting/')) {
+    const rawPath = currentPath.split('?')[0];
+    const meetingId = decodeURIComponent(rawPath.replace('/meeting/', '')) || activeRoom;
+    const urlParams = new URLSearchParams(window.location.search);
+    const mode = urlParams.get('mode') === 'audio' ? 'audio' : 'video';
+
+    return (
+      <div className="min-h-screen bg-[#070B14]">
+        <MeetingRoom
+          meetingId={meetingId}
+          initialMode={mode}
+          socket={socket}
+          currentUser={currentUser}
+          onReturnToWorkspace={handleReturnToWorkspace}
+          onOpenAuth={() => setIsAuthOpen(true)}
+        />
+        <AuthModal
+          isOpen={isAuthOpen}
+          onClose={() => setIsAuthOpen(false)}
+          onAuthSuccess={handleAuthSuccess}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#070B14] text-slate-100 flex flex-col items-center justify-start px-3 sm:px-6 lg:px-8 py-5 select-text">
@@ -119,6 +177,7 @@ export default function App() {
               connected={connected}
               currentUser={currentUser}
               onOpenAuth={() => setIsAuthOpen(true)}
+              onNavigateToMeeting={handleNavigateToMeeting}
             />
           </div>
 
@@ -166,3 +225,4 @@ export default function App() {
     </div>
   );
 }
+
