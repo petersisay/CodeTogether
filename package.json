@@ -4,8 +4,8 @@
   "description": "CodeTogether — Real-Time Collaborative Coding Workspace",
   "scripts": {
     "start": "npm start --prefix server",
-    "build": "npm install --prefix server",
-    "postinstall": "npm install --prefix server",
+    "build": "npm run build --prefix client",
+    "postinstall": "npm install --prefix server && npm install --prefix client",
     "install:all": "npm install --prefix client && npm install --prefix server",
     "dev:client": "npm run dev --prefix client",
     "dev:server": "npm run dev --prefix server",
