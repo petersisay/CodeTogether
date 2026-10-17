@@ -1,7 +1,7 @@
 import React from 'react';
 import { Zap, Users, MessageSquare, Cloud } from 'lucide-react';
 
-export default function NavbarHero({ onStartCoding }) {
+export default function NavbarHero({ onStartCoding, currentUser }) {
   const features = [
     {
       icon: Zap,
@@ -79,7 +79,7 @@ export default function NavbarHero({ onStartCoding }) {
           onClick={onStartCoding}
           className="px-6 py-3 rounded-full bg-gradient-to-r from-blue-600 to-sky-500 hover:from-blue-500 hover:to-sky-400 text-white font-medium text-sm shadow-[0_0_20px_rgba(37,99,235,0.4)] hover:shadow-[0_0_28px_rgba(56,189,248,0.5)] transition-all cursor-pointer flex items-center gap-2 group active:scale-95"
         >
-          <span>Start Coding Together</span>
+          <span>{currentUser ? `Continue as ${currentUser.username}` : 'Start Coding Together'}</span>
           <span className="group-hover:translate-x-1 transition-transform">→</span>
         </button>
 

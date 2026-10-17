@@ -8,11 +8,30 @@ import KeyFeatures from './components/KeyFeatures.jsx';
 import TechStack from './components/TechStack.jsx';
 import ArchitectureDiagram from './components/ArchitectureDiagram.jsx';
 import LearningGoalsFooter from './components/LearningGoalsFooter.jsx';
+import AuthModal from './components/AuthModal.jsx';
 
 export default function App() {
   const [activeRoom, setActiveRoom] = useState('ASTU_DreamTeam');
   const [socket, setSocket] = useState(null);
   const [connected, setConnected] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
+  const [isAuthOpen, setIsAuthOpen] = useState(false);
+
+  // Initialize stored user if any
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem('codetogether_user');
+      if (stored) {
+        setCurrentUser(JSON.parse(stored));
+      } else {
+        // Default demonstration user session
+        setCurrentUser({
+          username: 'Petros',
+          avatar: '/assets/avatar-petros.png',
+        });
+      }
+    } catch (e) {}
+  }, []);
 
   // Initialize Socket.IO connection
   useEffect(() => {
@@ -20,13 +39,15 @@ export default function App() {
     const socketInstance = io(backendUrl, {
       transports: ['websocket', 'polling'],
       autoConnect: true,
-      reconnectionAttempts: 5,
+      reconnectionAttempts: 10,
       timeout: 10000,
     });
 
     socketInstance.on('connect', () => {
       setConnected(true);
-      socketInstance.emit('room:join', { room: activeRoom, user: 'Petros' });
+      const name = currentUser ? currentUser.username : 'Petros';
+      const av = currentUser ? currentUser.avatar : '/assets/avatar-petros.png';
+      socketInstance.emit('room:join', { room: activeRoom, user: name, avatar: av });
     });
 
     socketInstance.on('disconnect', () => {
@@ -40,23 +61,39 @@ export default function App() {
     };
   }, []);
 
-  // When room changes, notify socket server
+  // When room or user changes, update socket room
   useEffect(() => {
     if (socket && socket.connected) {
-      socket.emit('room:join', { room: activeRoom, user: 'Petros' });
+      const name = currentUser ? currentUser.username : 'Petros';
+      const av = currentUser ? currentUser.avatar : '/assets/avatar-petros.png';
+      socket.emit('room:join', { room: activeRoom, user: name, avatar: av });
     }
-  }, [activeRoom, socket]);
+  }, [activeRoom, currentUser, socket]);
 
   const handleStartCoding = () => {
     const el = document.getElementById('coding-workspace');
     if (el) {
       el.scrollIntoView({ behavior: 'smooth' });
     }
+    if (!currentUser) {
+      setIsAuthOpen(true);
+    }
+  };
+
+  const handleAuthSuccess = (user, token) => {
+    setCurrentUser(user);
+    if (socket && socket.connected) {
+      socket.emit('room:join', {
+        room: activeRoom,
+        user: user.username,
+        avatar: user.avatar,
+      });
+    }
   };
 
   return (
     <div className="min-h-screen bg-[#070B14] text-slate-100 flex flex-col items-center justify-start px-3 sm:px-6 lg:px-8 py-5 select-text">
-      {/* Background radial glow matching the reference design */}
+      {/* Background radial glow */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
         <div className="absolute -top-32 left-1/4 w-[600px] h-[600px] bg-blue-600/10 rounded-full blur-[140px]"></div>
         <div className="absolute top-1/3 -right-32 w-[500px] h-[500px] bg-purple-600/8 rounded-full blur-[140px]"></div>
@@ -70,7 +107,7 @@ export default function App() {
         <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
           {/* Left Column: Landing Page Hero & Feature Highlights (Part 2) */}
           <div className="lg:col-span-4 flex flex-col justify-start">
-            <NavbarHero onStartCoding={handleStartCoding} />
+            <NavbarHero onStartCoding={handleStartCoding} currentUser={currentUser} />
           </div>
 
           {/* Center Column: Collaborative Coding Workspace (Part 3) */}
@@ -80,6 +117,8 @@ export default function App() {
               setActiveRoom={setActiveRoom}
               socket={socket}
               connected={connected}
+              currentUser={currentUser}
+              onOpenAuth={() => setIsAuthOpen(true)}
             />
           </div>
 
@@ -117,6 +156,13 @@ export default function App() {
           <LearningGoalsFooter onLetsGo={handleStartCoding} />
         </div>
       </div>
+
+      {/* Auth Modal */}
+      <AuthModal
+        isOpen={isAuthOpen}
+        onClose={() => setIsAuthOpen(false)}
+        onAuthSuccess={handleAuthSuccess}
+      />
     </div>
   );
 }
