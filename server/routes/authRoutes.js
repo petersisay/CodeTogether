@@ -39,62 +39,184 @@ export async function verifyGoogleIdToken(credential, clientId) {
   return ticket.getPayload();
 }
 
-// 1. GOOGLE SIGN-IN
-router.post('/google', async (req, res) => {
+// Helper: Validate Google Credential Token with strict security checks
+export async function validateGoogleCredential(credential) {
+  if (!credential) {
+    const err = new Error('Google ID token credential is required');
+    err.status = 400;
+    throw err;
+  }
+
+  const clientId = process.env.GOOGLE_CLIENT_ID;
+  if (!clientId) {
+    const err = new Error('Google authentication is not configured on this server');
+    err.status = 500;
+    throw err;
+  }
+
+  let payload;
+  try {
+    payload = await verifyGoogleIdToken(credential, clientId);
+  } catch (err) {
+    const error = new Error('Invalid or expired Google credential');
+    error.status = 401;
+    throw error;
+  }
+
+  if (!payload || !payload.sub) {
+    const err = new Error('Invalid Google token: missing subject identifier');
+    err.status = 401;
+    throw err;
+  }
+
+  // Verify audience
+  if (payload.aud !== clientId) {
+    const err = new Error('Token audience does not match configured Google Client ID');
+    err.status = 401;
+    throw err;
+  }
+
+  // Verify issuer
+  const validIssuers = ['accounts.google.com', 'https://accounts.google.com'];
+  if (!validIssuers.includes(payload.iss)) {
+    const err = new Error('Invalid token issuer');
+    err.status = 401;
+    throw err;
+  }
+
+  // Check expiration
+  const nowSec = Math.floor(Date.now() / 1000);
+  if (payload.exp && payload.exp < nowSec) {
+    const err = new Error('Google ID token has expired');
+    err.status = 401;
+    throw err;
+  }
+
+  // Enforce verified email policy
+  if (payload.email_verified === false) {
+    const err = new Error('Google account email must be verified');
+    err.status = 403;
+    throw err;
+  }
+
+  if (!payload.email) {
+    const err = new Error('Google token does not contain an email address');
+    err.status = 400;
+    throw err;
+  }
+
+  const googleId = payload.sub;
+  const email = payload.email.trim().toLowerCase();
+  const displayName = (payload.name && payload.name.trim()) || email.split('@')[0];
+  const avatar = payload.picture || '';
+
+  return { payload, googleId, email, displayName, avatar };
+}
+
+// 1. GOOGLE VERIFY ENDPOINT (Checks if account exists, returns user profile or prompts for username)
+router.post('/google/verify', async (req, res) => {
   try {
     const { credential } = req.body;
-    if (!credential) {
-      return res.status(400).json({ error: 'Google ID token credential is required' });
+    const { googleId, email, displayName, avatar } = await validateGoogleCredential(credential);
+
+    const isConnected = mongoose.connection.readyState === 1;
+
+    if (isConnected) {
+      let user = await User.findOne({ googleId });
+      if (!user) {
+        user = await User.findOne({ email });
+      }
+
+      if (user) {
+        const token = generateToken({
+          id: user._id,
+          username: user.username,
+          email: user.email,
+          avatar: user.avatar,
+          authProvider: user.authProvider || 'google',
+        });
+
+        return res.json({
+          exists: true,
+          token,
+          user: {
+            id: user._id,
+            username: user.username,
+            email: user.email,
+            avatar: user.avatar,
+            authProvider: user.authProvider || 'google',
+          },
+        });
+      }
+
+      const suggestedUsername = displayName
+        .toLowerCase()
+        .replace(/[^a-z0-9_]/g, '')
+        .slice(0, 20) || email.split('@')[0].replace(/[^a-z0-9_]/g, '');
+
+      return res.json({
+        exists: false,
+        email,
+        displayName,
+        avatar,
+        suggestedUsername,
+      });
     }
 
-    const clientId = process.env.GOOGLE_CLIENT_ID;
-    if (!clientId) {
-      console.error('[Google Auth] GOOGLE_CLIENT_ID environment variable is missing.');
-      return res.status(500).json({ error: 'Google authentication is not configured on this server' });
+    // In-memory fallback
+    let memUser = null;
+    for (const u of memoryUsers.values()) {
+      if (u.googleId === googleId || u.email === email) {
+        memUser = u;
+        break;
+      }
     }
 
-    let payload;
-    try {
-      payload = await verifyGoogleIdToken(credential, clientId);
-    } catch (err) {
-      console.error('[Google Auth Error]: Verification failed:', err.message);
-      return res.status(401).json({ error: 'Invalid or expired Google credential' });
+    if (memUser) {
+      const token = generateToken({
+        id: memUser.id,
+        username: memUser.username,
+        email: memUser.email,
+        avatar: memUser.avatar,
+        authProvider: memUser.authProvider || 'google',
+      });
+
+      return res.json({
+        exists: true,
+        token,
+        user: {
+          id: memUser.id,
+          username: memUser.username,
+          email: memUser.email,
+          avatar: memUser.avatar,
+          authProvider: memUser.authProvider || 'google',
+        },
+      });
     }
 
-    if (!payload || !payload.sub) {
-      return res.status(401).json({ error: 'Invalid Google token: missing subject identifier' });
-    }
+    const suggestedUsername = displayName
+      .toLowerCase()
+      .replace(/[^a-z0-9_]/g, '')
+      .slice(0, 20) || email.split('@')[0].replace(/[^a-z0-9_]/g, '');
 
-    // Verify audience
-    if (payload.aud !== clientId) {
-      return res.status(401).json({ error: 'Token audience does not match configured Google Client ID' });
-    }
+    return res.json({
+      exists: false,
+      email,
+      displayName,
+      avatar,
+      suggestedUsername,
+    });
+  } catch (err) {
+    console.error('[Google Verify Error]:', err.message);
+    return res.status(err.status || 500).json({ error: err.message || 'Google verification failed' });
+  }
+});
 
-    // Verify issuer
-    const validIssuers = ['accounts.google.com', 'https://accounts.google.com'];
-    if (!validIssuers.includes(payload.iss)) {
-      return res.status(401).json({ error: 'Invalid token issuer' });
-    }
-
-    // Check expiration
-    const nowSec = Math.floor(Date.now() / 1000);
-    if (payload.exp && payload.exp < nowSec) {
-      return res.status(401).json({ error: 'Google ID token has expired' });
-    }
-
-    // Enforce verified email policy
-    if (payload.email_verified === false) {
-      return res.status(403).json({ error: 'Google account email must be verified' });
-    }
-
-    if (!payload.email) {
-      return res.status(400).json({ error: 'Google token does not contain an email address' });
-    }
-
-    const googleId = payload.sub;
-    const email = payload.email.trim().toLowerCase();
-    const displayName = (payload.name && payload.name.trim()) || email.split('@')[0];
-    const avatar = payload.picture || '';
+// 2. GOOGLE SIGN-IN & REGISTRATION
+router.post('/google', async (req, res) => {
+  try {
+    const { credential, username: customUsername, password: customPassword } = req.body;
+    const { googleId, email, displayName, avatar } = await validateGoogleCredential(credential);
 
     const isConnected = mongoose.connection.readyState === 1;
 
@@ -106,8 +228,12 @@ router.post('/google', async (req, res) => {
         // Update avatar if updated in Google profile
         if (avatar && user.avatar !== avatar) {
           user.avatar = avatar;
-          await user.save();
         }
+        // If user is setting a password for subsequent logins
+        if (customPassword && customPassword.length >= 6 && !user.password) {
+          user.password = customPassword;
+        }
+        await user.save();
       } else {
         // 2. Check if account with same email exists
         const existingEmailUser = await User.findOne({ email });
@@ -122,17 +248,38 @@ router.post('/google', async (req, res) => {
               error: 'An account with this email is already associated with a different Google account.',
             });
           }
-        }
+          user = existingEmailUser;
+        } else {
+          // 3. Create new Google user with preferred username and optional password
+          const desiredUsername = (customUsername && customUsername.trim()) || displayName;
 
-        // 3. Create new Google user
-        user = await User.create({
-          googleId,
-          email,
-          username: displayName,
-          avatar,
-          authProvider: 'google',
-          emailVerified: true,
-        });
+          if (desiredUsername.length < 3) {
+            return res.status(400).json({ error: 'Username must be at least 3 characters long' });
+          }
+
+          // Check if desired username is already taken by another account
+          const usernameConflict = await User.findOne({ username: desiredUsername });
+          if (usernameConflict) {
+            return res.status(409).json({
+              error: `Username "${desiredUsername}" is already taken. Please choose another username.`,
+            });
+          }
+
+          const newUserDoc = {
+            googleId,
+            email,
+            username: desiredUsername,
+            avatar,
+            authProvider: 'google',
+            emailVerified: true,
+          };
+
+          if (customPassword && customPassword.length >= 6) {
+            newUserDoc.password = customPassword;
+          }
+
+          user = await User.create(newUserDoc);
+        }
       }
 
       const token = generateToken({
@@ -182,17 +329,40 @@ router.post('/google', async (req, res) => {
         }
       }
 
+      const desiredUsername = (customUsername && customUsername.trim()) || displayName;
+      if (desiredUsername.length < 3) {
+        return res.status(400).json({ error: 'Username must be at least 3 characters long' });
+      }
+
+      for (const u of memoryUsers.values()) {
+        if (u.username === desiredUsername) {
+          return res.status(409).json({
+            error: `Username "${desiredUsername}" is already taken. Please choose another username.`,
+          });
+        }
+      }
+
+      let hashedPassword = undefined;
+      if (customPassword && customPassword.length >= 6) {
+        hashedPassword = await bcrypt.hash(customPassword, 10);
+      }
+
       const newId = 'google_user_' + googleId.slice(-8);
       memUser = {
         id: newId,
         googleId,
-        username: displayName,
+        username: desiredUsername,
         email,
+        password: hashedPassword,
         avatar,
         authProvider: 'google',
         emailVerified: true,
       };
       memoryUsers.set(newId, memUser);
+    } else {
+      if (customPassword && customPassword.length >= 6 && !memUser.password) {
+        memUser.password = await bcrypt.hash(customPassword, 10);
+      }
     }
 
     const token = generateToken({
@@ -219,7 +389,7 @@ router.post('/google', async (req, res) => {
     if (err.code === 11000) {
       return res.status(409).json({ error: 'User record collision during sign-in. Please try again.' });
     }
-    return res.status(500).json({ error: 'Server error during Google authentication' });
+    return res.status(err.status || 500).json({ error: err.message || 'Server error during Google authentication' });
   }
 });
 
@@ -349,6 +519,12 @@ router.post('/login', async (req, res) => {
         return res.status(401).json({ error: 'Invalid credentials' });
       }
 
+      if (!user.password && user.authProvider === 'google') {
+        return res.status(401).json({
+          error: 'This account was registered with Google without a password. Please sign in using the "Sign in with Google" button.',
+        });
+      }
+
       const isMatch = await user.comparePassword(password);
       if (!isMatch) {
         return res.status(401).json({ error: 'Invalid credentials' });
@@ -385,6 +561,12 @@ router.post('/login', async (req, res) => {
     const memUser = findMemoryUser(identifier);
     if (!memUser) {
       return res.status(401).json({ error: 'Invalid credentials' });
+    }
+
+    if (!memUser.password && memUser.authProvider === 'google') {
+      return res.status(401).json({
+        error: 'This account was registered with Google without a password. Please sign in using the "Sign in with Google" button.',
+      });
     }
 
     const isMemMatch = await bcrypt.compare(password, memUser.password);

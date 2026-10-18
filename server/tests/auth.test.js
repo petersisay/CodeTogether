@@ -246,5 +246,100 @@ test('Google Authentication API — Verification & Policy Enforcement', async (t
     const data = await res.json();
     assert.ok(data.error.includes('already exists using password'));
   });
+
+  await t.test('POST /google/verify identifies new user and returns suggested username', async () => {
+    global.__MOCK_GOOGLE_VERIFY__ = async () => ({
+      sub: 'google_sub_new_user_123',
+      aud: TEST_CLIENT_ID,
+      iss: 'https://accounts.google.com',
+      email: 'newuser.test@gmail.com',
+      email_verified: true,
+      name: 'New Test User',
+      picture: 'https://lh3.googleusercontent.com/newuser.png',
+      exp: Math.floor(Date.now() / 1000) + 3600,
+    });
+
+    const res = await fetch(`${baseUrl}/google/verify`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ credential: 'mock_token_new_user' }),
+    });
+
+    assert.strictEqual(res.status, 200);
+    const data = await res.json();
+    assert.strictEqual(data.exists, false);
+    assert.strictEqual(data.email, 'newuser.test@gmail.com');
+    assert.ok(data.suggestedUsername);
+  });
+
+  await t.test('Registers new Google user with custom username and password, then allows returning sign-in with password', async () => {
+    global.__MOCK_GOOGLE_VERIFY__ = async () => ({
+      sub: 'google_sub_custom_user_789',
+      aud: TEST_CLIENT_ID,
+      iss: 'https://accounts.google.com',
+      email: 'petrossisay.test@gmail.com',
+      email_verified: true,
+      name: 'Petros Sisay',
+      picture: 'https://lh3.googleusercontent.com/petros.png',
+      exp: Math.floor(Date.now() / 1000) + 3600,
+    });
+
+    // 1. Complete registration with custom username and password
+    const regRes = await fetch(`${baseUrl}/google`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        credential: 'mock_token_custom_user',
+        username: 'petros_custom',
+        password: 'securePassword123',
+      }),
+    });
+
+    assert.strictEqual(regRes.status, 200);
+    const regData = await regRes.json();
+    assert.strictEqual(regData.user.username, 'petros_custom');
+    assert.strictEqual(regData.user.email, 'petrossisay.test@gmail.com');
+
+    // 2. Returning sign-in by username and password
+    const loginByUsernameRes = await fetch(`${baseUrl}/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        identifier: 'petros_custom',
+        password: 'securePassword123',
+      }),
+    });
+
+    assert.strictEqual(loginByUsernameRes.status, 200);
+    const loginByUserData = await loginByUsernameRes.json();
+    assert.strictEqual(loginByUserData.user.username, 'petros_custom');
+
+    // 3. Returning sign-in by Google email and password
+    const loginByEmailRes = await fetch(`${baseUrl}/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        identifier: 'petrossisay.test@gmail.com',
+        password: 'securePassword123',
+      }),
+    });
+
+    assert.strictEqual(loginByEmailRes.status, 200);
+    const loginByEmailData = await loginByEmailRes.json();
+    assert.strictEqual(loginByEmailData.user.username, 'petros_custom');
+
+    // 4. Verification endpoint now recognizes user exists
+    const verifyAgainRes = await fetch(`${baseUrl}/google/verify`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ credential: 'mock_token_custom_user' }),
+    });
+
+    assert.strictEqual(verifyAgainRes.status, 200);
+    const verifyAgainData = await verifyAgainRes.json();
+    assert.strictEqual(verifyAgainData.exists, true);
+    assert.strictEqual(verifyAgainData.user.username, 'petros_custom');
+  });
 });
+
 

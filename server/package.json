@@ -8,6 +8,7 @@
     "start": "node server.js",
     "dev": "node --watch server.js",
     "test": "node --test tests/**/*.test.js",
+    "benchmark": "node scripts/benchmarkPerformance.js",
     "inspect-demo": "node scripts/inspectDemoAccounts.js",
     "cleanup-demo": "node scripts/cleanupDemoAccounts.js"
   },
