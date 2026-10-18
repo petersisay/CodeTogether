@@ -7,13 +7,16 @@
   "scripts": {
     "start": "node server.js",
     "dev": "node --watch server.js",
-    "test": "node --test tests/**/*.test.js"
+    "test": "node --test tests/**/*.test.js",
+    "inspect-demo": "node scripts/inspectDemoAccounts.js",
+    "cleanup-demo": "node scripts/cleanupDemoAccounts.js"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
+    "google-auth-library": "^11.3.1",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^8.9.5",
     "socket.io": "^4.8.1"

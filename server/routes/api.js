@@ -82,7 +82,7 @@ router.post('/rooms/:name/messages', async (req, res) => {
       sender,
       text,
       time: time || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      avatar: avatar || '/assets/avatar-petros.png',
+      avatar: avatar || '',
     });
     res.status(201).json(newMsg);
   } catch (err) {
