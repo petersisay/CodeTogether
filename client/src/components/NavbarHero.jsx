@@ -1,7 +1,7 @@
 import React from 'react';
 import { Zap, Users, MessageSquare, Cloud } from 'lucide-react';
 
-export default function NavbarHero({ onStartCoding, currentUser }) {
+export default function NavbarHero({ onStartCoding, currentUser, onOpenAuth }) {
   const features = [
     {
       icon: Zap,
@@ -73,8 +73,8 @@ export default function NavbarHero({ onStartCoding, currentUser }) {
         })}
       </div>
 
-      {/* Primary Call-to-action & Handwritten Slogan */}
-      <div className="flex flex-wrap items-center gap-5 mt-7">
+      {/* Primary Call-to-action & Actions */}
+      <div className="flex flex-wrap items-center gap-4 mt-7">
         <button
           onClick={onStartCoding}
           className="px-6 py-3 rounded-full bg-gradient-to-r from-blue-600 to-sky-500 hover:from-blue-500 hover:to-sky-400 text-white font-medium text-sm shadow-[0_0_20px_rgba(37,99,235,0.4)] hover:shadow-[0_0_28px_rgba(56,189,248,0.5)] transition-all cursor-pointer flex items-center gap-2 group active:scale-95"
@@ -82,6 +82,23 @@ export default function NavbarHero({ onStartCoding, currentUser }) {
           <span>{currentUser ? `Continue as ${currentUser.username}` : 'Start Coding Together'}</span>
           <span className="group-hover:translate-x-1 transition-transform">→</span>
         </button>
+
+        {!currentUser && (
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => onOpenAuth?.('login')}
+              className="px-4 py-2.5 rounded-full bg-blue-950/70 hover:bg-blue-900/60 border border-blue-700/50 text-sky-300 hover:text-white font-medium text-xs transition-all cursor-pointer"
+            >
+              Sign In
+            </button>
+            <button
+              onClick={() => onOpenAuth?.('register')}
+              className="px-4 py-2.5 rounded-full bg-blue-600/30 hover:bg-blue-600/50 border border-blue-500/50 text-white font-medium text-xs transition-all cursor-pointer"
+            >
+              Sign Up
+            </button>
+          </div>
+        )}
 
         <div className="font-handwriting text-xl sm:text-2xl text-sky-300/90 -rotate-3 select-none drop-shadow-[0_2px_8px_rgba(56,189,248,0.2)]">
           Better code with better people.

@@ -417,13 +417,22 @@ export default function WorkspaceWindow({
               )}
             </div>
           ) : (
-            <button
-              id="btn-auth-trigger"
-              onClick={onOpenAuth}
-              className="px-2.5 py-0.5 rounded-md bg-blue-600 hover:bg-blue-500 text-[10px] font-medium text-white shadow-sm cursor-pointer transition-colors"
-            >
-              Sign In
-            </button>
+            <div className="flex items-center gap-1.5">
+              <button
+                id="btn-auth-trigger"
+                onClick={() => onOpenAuth?.('login')}
+                className="px-2 py-0.5 rounded-md bg-blue-950/70 border border-blue-700/40 text-[10px] text-sky-300 hover:text-white hover:bg-blue-900/50 cursor-pointer transition-colors"
+              >
+                Sign In
+              </button>
+              <button
+                id="btn-signup-trigger"
+                onClick={() => onOpenAuth?.('register')}
+                className="px-2 py-0.5 rounded-md bg-blue-600 hover:bg-blue-500 text-[10px] font-medium text-white shadow-sm cursor-pointer transition-colors"
+              >
+                Sign Up
+              </button>
+            </div>
           )}
         </div>
       </div>

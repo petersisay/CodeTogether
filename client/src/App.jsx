@@ -17,6 +17,7 @@ export default function App() {
   const [connected, setConnected] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
+  const [authMode, setAuthMode] = useState('login');
   const [currentPath, setCurrentPath] = useState(() => window.location.pathname + window.location.search);
 
   // 1. Initialize user from validated localStorage credentials
@@ -89,13 +90,18 @@ export default function App() {
     }
   }, [activeRoom, currentUser, socket]);
 
+  const handleOpenAuth = (mode = 'login') => {
+    setAuthMode(mode);
+    setIsAuthOpen(true);
+  };
+
   const handleStartCoding = () => {
     const el = document.getElementById('coding-workspace');
     if (el) {
       el.scrollIntoView({ behavior: 'smooth' });
     }
     if (!currentUser) {
-      setIsAuthOpen(true);
+      handleOpenAuth('register');
     }
   };
 
@@ -108,6 +114,7 @@ export default function App() {
     }
   };
 
+  // Keep workspace history and data intact on sign-out (clear credentials only)
   const handleSignOut = () => {
     localStorage.removeItem('codetogether_token');
     localStorage.removeItem('codetogether_user');
@@ -115,8 +122,7 @@ export default function App() {
     if (socket) {
       socket.auth = { token: null };
       socket.emit('auth:authenticate', { token: null });
-      socket.disconnect();
-      socket.connect();
+      // Keep socket session and workspace data intact in guest/read-only mode
     }
   };
 
@@ -177,7 +183,11 @@ export default function App() {
         <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
           {/* Left Column: Landing Page Hero & Feature Highlights (Part 2) */}
           <div className="lg:col-span-4 flex flex-col justify-start">
-            <NavbarHero onStartCoding={handleStartCoding} currentUser={currentUser} />
+            <NavbarHero
+              onStartCoding={handleStartCoding}
+              currentUser={currentUser}
+              onOpenAuth={handleOpenAuth}
+            />
           </div>
 
           {/* Center Column: Collaborative Coding Workspace (Part 3) */}
@@ -188,7 +198,7 @@ export default function App() {
               socket={socket}
               connected={connected}
               currentUser={currentUser}
-              onOpenAuth={() => setIsAuthOpen(true)}
+              onOpenAuth={handleOpenAuth}
               onSignOut={handleSignOut}
               onNavigateToMeeting={handleNavigateToMeeting}
             />
@@ -232,6 +242,7 @@ export default function App() {
       {/* Auth Modal */}
       <AuthModal
         isOpen={isAuthOpen}
+        initialMode={authMode}
         onClose={() => setIsAuthOpen(false)}
         onAuthSuccess={handleAuthSuccess}
       />
