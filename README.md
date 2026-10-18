@@ -8,12 +8,13 @@
 ## 🌟 Core Features
 
 1. **Real-Time Code Collaboration:** Multi-user live code editing with file version sequencing, active cursor indicators, and conflict detection.
-2. **Dedicated Voice & Video Meetings:** Native WebRTC peer-to-peer voice and video calls (`/meeting/:meetingId`) with microphone mute/unmute, camera on/off, real-time speaking indicators, and participant connection state.
-3. **Camera-Independent Audio Calls:** Dedicated voice-only mode that functions seamlessly without requesting video camera permissions.
-4. **Project Rooms & File Management:** Multi-tab file organization (`App.jsx`, `index.js`, `style.css`), file creation, saving, and deletion with authorized access control.
-5. **Real-Time Deduplicated Text Chat:** Instant messaging synchronized through authenticated WebSockets directly to MongoDB without duplicate records.
-6. **Presence & Activity Tracking:** Live collaborator avatars showing who is online and which file/line they are editing.
-7. **Secure JWT Authentication & Authorization:** Token-based authentication verifying all room mutations, file updates, and WebSocket connections with no client-side impersonation.
+2. **Secure Google Account Sign-In:** Official Google Identity Services integration with backend token signature verification via `google-auth-library`.
+3. **Dedicated Voice & Video Meetings:** Native WebRTC peer-to-peer voice and video calls (`/meeting/:meetingId`) with microphone mute/unmute, camera on/off, real-time speaking indicators, and participant connection state.
+4. **Camera-Independent Audio Calls:** Dedicated voice-only mode that functions seamlessly without requesting video camera permissions.
+5. **Project Rooms & File Management:** Multi-tab file organization (`App.jsx`, `index.js`, `style.css`), file creation, saving, and deletion with authorized access control.
+6. **Real-Time Deduplicated Text Chat:** Instant messaging synchronized through authenticated WebSockets directly to MongoDB without duplicate records.
+7. **Honest Presence & Activity Tracking:** Live collaborator presence derived strictly from genuine Socket.IO connections. Zero fake users, fake counts, or fabricated avatars.
+8. **Secure JWT Authentication & Authorization:** Token-based session verification protecting all room mutations, file updates, and WebSocket connections with no client-side impersonation.
 
 ---
 
@@ -21,8 +22,8 @@
 
 Built strictly with JavaScript and JSX:
 
-- **Frontend:** React 19, Vite, Tailwind CSS, Lucide Icons, Socket.IO Client, WebRTC Native Media APIs
-- **Backend:** Node.js, Express.js, Socket.IO Server, Mongoose, JWT (`jsonwebtoken`), `bcryptjs`
+- **Frontend:** React 19, Vite, Tailwind CSS, Lucide Icons, Socket.IO Client, Google Identity Services (`@accounts.google.com/gsi/client`), WebRTC Native Media APIs
+- **Backend:** Node.js, Express.js, Socket.IO Server, Mongoose, Google Auth Library (`google-auth-library`), JWT (`jsonwebtoken`), `bcryptjs`
 - **Database:** MongoDB Atlas
 - **Testing:** Node.js native test runner (`node:test`, `node:assert`)
 - **Deployment:** Vercel (Frontend SPA with rewrites), Render (Backend Express & Socket.IO server)
@@ -45,10 +46,11 @@ Built strictly with JavaScript and JSX:
 ```
 
 ### Communication Flow:
+- **Google Identity Verification:** The frontend obtains a Google ID token credential using Google Identity Services and sends it to `POST /api/auth/google`. The backend validates token signature, issuer, audience (`GOOGLE_CLIENT_ID`), expiry, and `email_verified: true`, then issues the application JWT session.
 - **WebRTC Media Stream:** Audio and video streams flow directly peer-to-peer between participant browsers. Media is never routed through Socket.IO or stored in MongoDB.
 - **Socket.IO Signaling:** Acts as the WebRTC signaling gateway for exchanging SDP offers, answers, ICE candidates, and mute/speaking status between authenticated peers.
 - **Code Synchronization:** Synchronizes code changes with version tracking and collision notifications to prevent blind overwrites.
-- **REST Endpoints:** Handles registration, login, and initial resource hydration with JWT bearer token verification.
+- **REST Endpoints:** Handles authentication, rooms, files, and chat history with JWT bearer token verification.
 
 ---
 
@@ -67,24 +69,27 @@ Built strictly with JavaScript and JSX:
 
 ## 🔐 Security & Reliability Improvements
 
-1. **Socket.IO Handshake Authentication:** Sockets verify JWT tokens on connection. Unauthenticated sockets cannot join rooms or edit code.
-2. **Identity Derivation:** Sender identity and avatar are strictly derived from verified JWT tokens on the server, eliminating client-side impersonation.
-3. **Protected Mutating Endpoints:** Room creation, file creation, updates, and deletion require valid `Authorization: Bearer <token>` headers.
-4. **Strict CORS Policy:** Origin validation restricts access to explicit whitelist origins (`localhost`, `127.0.0.1`, and production domain).
-5. **No Duplicate Chat Messages:** Single-dispatch persistence through authenticated socket events prevents duplicated records caused by concurrent HTTP and WebSocket writes.
-6. **Production Fail-Safe:** Server fails safely if `JWT_SECRET` is missing in production mode rather than falling back to insecure defaults.
-7. **Database Reliability:** Explicit HTTP status codes (400, 401, 403, 409, 500, 503) are returned instead of silently masking database errors with in-memory storage.
+1. **Google Account Token Verification:** All Google sign-ins are verified server-side using Google's public key certificates. Browser-supplied profile metadata is never trusted blindly.
+2. **Account Linking Protection:** Automatic linking by raw email is prevented to protect existing local accounts from unauthorized takeover.
+3. **Socket.IO Handshake Authentication:** Sockets verify JWT tokens on connection. Unauthenticated sockets cannot join rooms or edit code.
+4. **Identity Derivation:** Sender identity and avatar are strictly derived from verified JWT tokens on the server, eliminating client-side impersonation.
+5. **Protected Mutating Endpoints:** Room creation, file creation, updates, and deletion require valid `Authorization: Bearer <token>` headers.
+6. **Strict CORS Policy:** Origin validation restricts access to explicit whitelist origins (`localhost`, `127.0.0.1`, and `https://code-together-weld.vercel.app`).
+7. **No Duplicate Chat Messages:** Single-dispatch persistence through authenticated socket events prevents duplicated records caused by concurrent HTTP and WebSocket writes.
+8. **Demo Accounts Removed:** All fake avatars, mock chat messages, hardcoded credentials, and simulated online counts have been eliminated from production behavior.
+9. **Safe Database Inspection Tools:** Read-only script (`npm run inspect-demo --prefix server`) inspects MongoDB for legacy test accounts without modifying or leaking records.
+10. **Production Fail-Safe:** Server fails safely if `JWT_SECRET` is missing in production mode rather than falling back to insecure defaults.
 
 ---
 
 ## 🧪 Automated Test Suite
 
-CodeTogether includes 19 comprehensive unit and integration tests covering authentication, route authorization, socket permissions, code collision detection, and WebRTC signaling.
+CodeTogether includes 28 comprehensive automated unit and integration tests covering Google authentication, route authorization, socket permissions, code collision detection, and WebRTC signaling.
 
 To run the complete test suite:
 
 ```bash
-# Run backend tests
+# Run backend tests (all 28 tests)
 npm test --prefix server
 
 # Run client build verification
@@ -95,6 +100,9 @@ npm test
 ```
 
 ### Verified Test Cases:
+- Google ID token verification (valid signatures, audience matching, issuer validation)
+- Google token expiration and unverified email rejection (401 / 403)
+- Account takeover protection (rejecting Google takeover of existing password account)
 - Token generation and verification
 - Invalid and tampered token rejection
 - Room listing and unauthenticated access rejection (401)
@@ -128,17 +136,26 @@ npm test
    - `NODE_ENV`: `production`
    - `MONGODB_URI`: `<your_mongodb_atlas_uri>`
    - `JWT_SECRET`: `<minimum_32_character_secret>`
-   - `CLIENT_URL`: `<your_vercel_frontend_url>`
+   - `CLIENT_URL`: `https://code-together-weld.vercel.app`
+   - `GOOGLE_CLIENT_ID`: `764795198689-41h522pnno7r3ifmb6im3iu12418m31f.apps.googleusercontent.com`
 
 ### 3. Frontend — Vercel
 1. Import the repository into Vercel.
 2. Build Settings:
-   - **Root Directory:** `client` (or use root `vercel.json`)
+   - **Root Directory:** `client`
    - **Build Command:** `npm run build`
    - **Output Directory:** `dist`
 3. Environment Variables:
-   - `VITE_BACKEND_URL`: `<your_render_backend_url>`
-4. Direct routes (like `/meeting/:meetingId`) are automatically rewritten to `/index.html` via `vercel.json` for seamless SPA routing and page refreshes.
+   - `VITE_BACKEND_URL`: `https://codetogether-v1fo.onrender.com`
+   - `VITE_GOOGLE_CLIENT_ID`: `764795198689-41h522pnno7r3ifmb6im3iu12418m31f.apps.googleusercontent.com`
+4. Direct routes (like `/meeting/:meetingId`) are automatically rewritten to `/index.html` via `client/vercel.json` for seamless SPA routing and page refreshes.
+
+### 4. Google Cloud Console Configuration
+1. In [Google Cloud Console](https://console.cloud.google.com/apis/credentials), select the OAuth 2.0 Web Client:
+2. **Authorized JavaScript origins:**
+   - `https://code-together-weld.vercel.app`
+   - `http://localhost:5173` (for local development)
+3. Ensure the Client ID matches `GOOGLE_CLIENT_ID` on Render and `VITE_GOOGLE_CLIENT_ID` on Vercel.
 
 ---
 
