@@ -7,6 +7,10 @@ import { initialRoomData } from './routes/roomRoutes.js';
 // Map of active rooms -> Map of socket.id -> user info
 const activeRoomSessions = new Map();
 
+export function getRoomOnlineCount(roomName) {
+  return activeRoomSessions.get(roomName)?.size || 0;
+}
+
 // Map of active meetings -> Map of socket.id -> participant info
 const activeMeetingSessions = new Map();
 
@@ -103,7 +107,7 @@ export function setupSocket(io) {
       currentRoom = room;
       currentFile = file;
       const currentUser = socket.user.username;
-      const currentAvatar = socket.user.avatar || '/assets/avatar-petros.png';
+      const currentAvatar = socket.user.avatar || '';
 
       socket.join(room);
 
@@ -233,7 +237,7 @@ export function setupSocket(io) {
       if (!targetRoom || !text || !text.trim()) return;
 
       const senderName = socket.user.username;
-      const senderAvatar = socket.user.avatar || '/assets/avatar-petros.png';
+      const senderAvatar = socket.user.avatar || '';
       const now = new Date();
       const timeStr = `${now.getHours()}:${String(now.getMinutes()).padStart(2, '0')}`;
 
@@ -325,7 +329,7 @@ export function setupSocket(io) {
         socketId: socket.id,
         userId: socket.user.id,
         username: socket.user.username,
-        avatar: socket.user.avatar || '/assets/avatar-petros.png',
+        avatar: socket.user.avatar || '',
         mediaType,
         micActive: true,
         cameraActive: mediaType === 'audio-video',

@@ -547,13 +547,23 @@ export default function MeetingRoom({
             ) : (
               <div className="flex flex-col items-center justify-center p-6 text-center">
                 <div className="relative">
-                  <img
-                    src={currentUser?.avatar || '/assets/avatar-petros.png'}
-                    alt="Self"
-                    className={`w-20 h-20 rounded-full object-cover ring-2 transition-all ${
-                      isSpeakingLocal ? 'ring-emerald-400 scale-105' : 'ring-blue-500/40'
-                    }`}
-                  />
+                  {currentUser?.avatar ? (
+                    <img
+                      src={currentUser.avatar}
+                      alt="Self"
+                      className={`w-20 h-20 rounded-full object-cover ring-2 transition-all ${
+                        isSpeakingLocal ? 'ring-emerald-400 scale-105' : 'ring-blue-500/40'
+                      }`}
+                    />
+                  ) : (
+                    <div
+                      className={`w-20 h-20 rounded-full bg-gradient-to-tr from-blue-700 via-indigo-600 to-sky-500 text-white font-bold text-2xl flex items-center justify-center ring-2 transition-all ${
+                        isSpeakingLocal ? 'ring-emerald-400 scale-105' : 'ring-blue-500/40'
+                      }`}
+                    >
+                      {(currentUser?.username || 'Y').charAt(0).toUpperCase()}
+                    </div>
+                  )}
                   {isSpeakingLocal && (
                     <span className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-emerald-400 ring-2 ring-[#091124] animate-pulse"></span>
                   )}
@@ -686,13 +696,23 @@ function RemoteParticipantTile({ peer, stream, isSpeaking, connectionState }) {
       ) : (
         <div className="flex flex-col items-center justify-center p-6 text-center">
           <div className="relative">
-            <img
-              src={peer.avatar || '/assets/avatar-habtu.png'}
-              alt={peer.username}
-              className={`w-20 h-20 rounded-full object-cover ring-2 transition-all ${
-                isSpeaking ? 'ring-emerald-400 scale-105' : 'ring-blue-500/40'
-              }`}
-            />
+            {peer.avatar ? (
+              <img
+                src={peer.avatar}
+                alt={peer.username}
+                className={`w-20 h-20 rounded-full object-cover ring-2 transition-all ${
+                  isSpeaking ? 'ring-emerald-400 scale-105' : 'ring-blue-500/40'
+                }`}
+              />
+            ) : (
+              <div
+                className={`w-20 h-20 rounded-full bg-gradient-to-tr from-blue-700 via-indigo-600 to-sky-500 text-white font-bold text-2xl flex items-center justify-center ring-2 transition-all ${
+                  isSpeaking ? 'ring-emerald-400 scale-105' : 'ring-blue-500/40'
+                }`}
+              >
+                {(peer.username || '?').charAt(0).toUpperCase()}
+              </div>
+            )}
             {isSpeaking && (
               <span className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-emerald-400 ring-2 ring-[#091124] animate-pulse"></span>
             )}

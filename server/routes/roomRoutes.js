@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import Room from '../models/Room.js';
 import Message from '../models/Message.js';
 import { authenticateToken } from '../middleware/auth.js';
+import { getRoomOnlineCount } from '../socket.js';
 
 const router = express.Router();
 
@@ -83,29 +84,7 @@ h1 {
 }`,
       },
     ],
-    messages: [
-      {
-        id: 1,
-        sender: 'Petros',
-        time: '10:24',
-        text: 'This looks great! 🚀',
-        avatar: '/assets/avatar-petros.png',
-      },
-      {
-        id: 2,
-        sender: 'Habtu',
-        time: '10:25',
-        text: 'I added the new function. Check it out.',
-        avatar: '/assets/avatar-habtu.png',
-      },
-      {
-        id: 3,
-        sender: 'Mekdes',
-        time: '10:26',
-        text: "Nice! Let's test it now. ✅",
-        avatar: '/assets/avatar-mekdes.png',
-      },
-    ],
+    messages: [],
   },
   'Web Development': {
     name: 'Web Development',
@@ -155,7 +134,11 @@ router.get('/', async (req, res) => {
     if (isConnected) {
       const dbRooms = await Room.find().lean();
       if (dbRooms && dbRooms.length > 0) {
-        return res.json(dbRooms);
+        const enrichedRooms = dbRooms.map((r) => ({
+          ...r,
+          onlineCount: getRoomOnlineCount(r.name),
+        }));
+        return res.json(enrichedRooms);
       }
     }
   } catch (err) {
@@ -170,7 +153,7 @@ router.get('/', async (req, res) => {
     name: r.name,
     description: r.description,
     dotColor: r.dotColor,
-    onlineCount: r.name === 'ASTU_DreamTeam' ? 3 : r.name === 'Web Development' ? 2 : r.name === 'React Project' ? 1 : 0,
+    onlineCount: getRoomOnlineCount(r.name),
     fileCount: r.files ? r.files.length : 0,
   }));
   res.json(list);
@@ -429,7 +412,7 @@ router.post('/:name/messages', authenticateToken, async (req, res) => {
   }
 
   const senderName = req.user.username;
-  const senderAvatar = req.user.avatar || avatar || '/assets/avatar-petros.png';
+  const senderAvatar = req.user.avatar || avatar || '';
   const now = new Date();
   const timeStr = time || `${now.getHours()}:${String(now.getMinutes()).padStart(2, '0')}`;
 

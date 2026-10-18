@@ -21,7 +21,7 @@ const messageSchema = new mongoose.Schema(
     },
     avatar: {
       type: String,
-      default: '/assets/avatar-petros.png',
+      default: '',
     },
   },
   { timestamps: true }

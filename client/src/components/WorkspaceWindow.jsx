@@ -15,6 +15,7 @@ import {
   Video,
   Phone,
   AlertTriangle,
+  LogOut,
 } from 'lucide-react';
 import highlightCode from './SyntaxHighlighter.jsx';
 import CreateRoomModal from './CreateRoomModal.jsx';
@@ -27,6 +28,7 @@ export default function WorkspaceWindow({
   connected,
   currentUser,
   onOpenAuth,
+  onSignOut,
   onNavigateToMeeting,
 }) {
   const [activeTab, setActiveTab] = useState('App.jsx');
@@ -40,11 +42,24 @@ export default function WorkspaceWindow({
   const [isCreateFileOpen, setIsCreateFileOpen] = useState(false);
   const [savedStatus, setSavedStatus] = useState(false);
   const [conflictAlert, setConflictAlert] = useState(null);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
 
   const chatScrollRef = useRef(null);
   const textareaRef = useRef(null);
   const preRef = useRef(null);
   const saveTimeoutRef = useRef(null);
+  const userMenuRef = useRef(null);
+
+  // Close user menu on click outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target)) {
+        setUserMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
 
@@ -279,30 +294,8 @@ export default function WorkspaceWindow({
   const currentCode = files[activeTab] || '';
   const lines = currentCode.split('\n');
 
-  // Fallback collaborators list matching reference image if socket list is still connecting
-  const displayCollaborators =
-    collaborators.length > 0
-      ? collaborators
-      : [
-          {
-            name: 'Petros',
-            avatar: '/assets/avatar-petros.png',
-            activity: 'Editing App.jsx',
-            statusColor: 'bg-emerald-400',
-          },
-          {
-            name: 'Habtu',
-            avatar: '/assets/avatar-habtu.png',
-            activity: 'Editing style.css',
-            statusColor: 'bg-emerald-400',
-          },
-          {
-            name: 'Mekdes',
-            avatar: '/assets/avatar-mekdes.png',
-            activity: 'Viewing index.js',
-            statusColor: 'bg-emerald-400',
-          },
-        ];
+  // Real collaborators list from socket presence
+  const liveCollaborators = Array.isArray(collaborators) ? collaborators : [];
 
   return (
     <div className="w-full rounded-2xl bg-[#080E1E] border border-blue-900/50 shadow-[0_0_40px_rgba(14,35,80,0.4)] overflow-hidden flex flex-col text-left">
@@ -351,31 +344,87 @@ export default function WorkspaceWindow({
           </div>
 
           <div className="hidden sm:flex items-center gap-1 text-[11px] text-slate-400 font-medium">
-            <span>{Math.max(displayCollaborators.length, 1)} online</span>
-            <ChevronDown className="w-3 h-3 text-slate-500" />
+            <span>{liveCollaborators.length} online</span>
           </div>
 
           {/* Overlapping collaborator avatar circles */}
-          <div className="flex items-center -space-x-1.5 cursor-pointer" onClick={onOpenAuth}>
-            {displayCollaborators.slice(0, 3).map((collab, i) => (
-              <img
-                key={i}
-                src={collab.avatar}
-                alt={collab.name}
-                title={collab.name}
-                className="w-5 h-5 rounded-full border border-[#0A1226] object-cover ring-1 ring-blue-500/40"
-              />
-            ))}
-          </div>
+          {liveCollaborators.length > 0 && (
+            <div className="flex items-center -space-x-1.5">
+              {liveCollaborators.slice(0, 3).map((collab, i) =>
+                collab.avatar ? (
+                  <img
+                    key={collab.id || collab.socketId || i}
+                    src={collab.avatar}
+                    alt={collab.name}
+                    title={collab.name}
+                    className="w-5 h-5 rounded-full border border-[#0A1226] object-cover ring-1 ring-blue-500/40"
+                  />
+                ) : (
+                  <div
+                    key={collab.id || collab.socketId || i}
+                    title={collab.name}
+                    className="w-5 h-5 rounded-full bg-blue-700 border border-[#0A1226] text-white text-[9px] font-bold flex items-center justify-center ring-1 ring-blue-500/40"
+                  >
+                    {(collab.name || '?').charAt(0).toUpperCase()}
+                  </div>
+                )
+              )}
+            </div>
+          )}
 
-          {/* User Sign In Badge */}
-          <button
-            id="btn-auth-trigger"
-            onClick={onOpenAuth}
-            className="px-2 py-0.5 rounded-md bg-blue-950/70 border border-blue-700/40 text-[10px] text-sky-300 hover:text-white hover:bg-blue-900/50 cursor-pointer transition-colors"
-          >
-            {currentUser ? currentUser.username : 'Sign In'}
-          </button>
+          {/* User Profile / Sign In Dropdown */}
+          {currentUser ? (
+            <div className="relative" ref={userMenuRef}>
+              <button
+                id="btn-user-profile"
+                onClick={() => setUserMenuOpen((prev) => !prev)}
+                className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-blue-950/70 border border-blue-700/40 text-[10px] text-slate-200 hover:border-blue-500 transition-colors cursor-pointer"
+              >
+                {currentUser.avatar ? (
+                  <img
+                    src={currentUser.avatar}
+                    alt={currentUser.username}
+                    className="w-4 h-4 rounded-full object-cover"
+                  />
+                ) : (
+                  <span className="w-4 h-4 rounded-full bg-blue-600 text-white font-bold text-[9px] flex items-center justify-center">
+                    {(currentUser.username || '?').charAt(0).toUpperCase()}
+                  </span>
+                )}
+                <span className="font-medium max-w-[90px] truncate">{currentUser.username}</span>
+                <ChevronDown className="w-2.5 h-2.5 text-slate-400" />
+              </button>
+
+              {userMenuOpen && (
+                <div className="absolute right-0 top-full mt-1.5 w-44 rounded-xl bg-[#091124] border border-blue-900/60 shadow-2xl p-2 z-50 text-left">
+                  <div className="px-2 py-1.5 border-b border-blue-950/60 mb-1">
+                    <p className="text-xs font-semibold text-slate-200 truncate">{currentUser.username}</p>
+                    {currentUser.email && (
+                      <p className="text-[10px] text-slate-400 truncate">{currentUser.email}</p>
+                    )}
+                  </div>
+                  <button
+                    onClick={() => {
+                      setUserMenuOpen(false);
+                      onSignOut?.();
+                    }}
+                    className="w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-[11px] text-red-400 hover:bg-red-950/40 hover:text-red-300 transition-colors cursor-pointer"
+                  >
+                    <LogOut className="w-3 h-3" />
+                    <span>Sign Out</span>
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <button
+              id="btn-auth-trigger"
+              onClick={onOpenAuth}
+              className="px-2.5 py-0.5 rounded-md bg-blue-600 hover:bg-blue-500 text-[10px] font-medium text-white shadow-sm cursor-pointer transition-colors"
+            >
+              Sign In
+            </button>
+          )}
         </div>
       </div>
 
@@ -425,36 +474,34 @@ export default function WorkspaceWindow({
               </div>
 
               <div className="space-y-1">
-                {(roomsList.length > 0
-                  ? roomsList
-                  : [
-                      { name: 'ASTU_DreamTeam', online: 3, dotColor: 'bg-emerald-400' },
-                      { name: 'Web Development', online: 2, dotColor: 'bg-emerald-400' },
-                      { name: 'React Project', online: 1, dotColor: 'bg-blue-400' },
-                      { name: 'General Chat', online: 0, dotColor: 'bg-slate-500' },
-                    ]
-                ).map((room) => {
-                  const isSelected = (activeRoom || 'ASTU_DreamTeam') === room.name;
-                  return (
-                    <div
-                      key={room.name}
-                      onClick={() => setActiveRoom && setActiveRoom(room.name)}
-                      className={`flex items-center justify-between px-2 py-1 rounded-lg text-[11px] font-medium cursor-pointer transition-colors ${
-                        isSelected
-                          ? 'bg-blue-600/30 text-white border border-blue-500/40'
-                          : 'text-slate-400 hover:text-slate-200 hover:bg-blue-950/20'
-                      }`}
-                    >
-                      <div className="flex items-center gap-1.5 truncate">
-                        <span className={`w-1.5 h-1.5 rounded-full ${room.dotColor || 'bg-emerald-400'}`}></span>
-                        <span className="truncate">{room.name}</span>
+                {roomsList.length > 0 ? (
+                  roomsList.map((room) => {
+                    const isSelected = (activeRoom || 'ASTU_DreamTeam') === room.name;
+                    return (
+                      <div
+                        key={room.name}
+                        onClick={() => setActiveRoom && setActiveRoom(room.name)}
+                        className={`flex items-center justify-between px-2 py-1 rounded-lg text-[11px] font-medium cursor-pointer transition-colors ${
+                          isSelected
+                            ? 'bg-blue-600/30 text-white border border-blue-500/40'
+                            : 'text-slate-400 hover:text-slate-200 hover:bg-blue-950/20'
+                        }`}
+                      >
+                        <div className="flex items-center gap-1.5 truncate">
+                          <span className={`w-1.5 h-1.5 rounded-full ${room.dotColor || 'bg-emerald-400'}`}></span>
+                          <span className="truncate">{room.name}</span>
+                        </div>
+                        <span className="text-[10px] text-slate-400 px-1 rounded bg-blue-950/50">
+                          {room.online || 0}
+                        </span>
                       </div>
-                      <span className="text-[10px] text-slate-400 px-1 rounded bg-blue-950/50">
-                        {room.online || 0}
-                      </span>
-                    </div>
-                  );
-                })}
+                    );
+                  })
+                ) : (
+                  <div className="px-2 py-2 text-center text-[11px] text-slate-500 italic">
+                    No rooms found
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -566,24 +613,36 @@ export default function WorkspaceWindow({
             </div>
 
             <div className="space-y-2">
-              {displayCollaborators.map((user, idx) => (
-                <div key={user.socketId || `${user.name}-${user.activity || ''}-${idx}`} className="flex items-center gap-2">
-                  <div className="relative">
-                    <img
-                      src={user.avatar}
-                      alt={user.name}
-                      className="w-6 h-6 rounded-full object-cover ring-1 ring-blue-500/30"
-                    />
-                    <span
-                      className={`absolute -bottom-0.5 -right-0.5 w-1.5 h-1.5 rounded-full ${user.statusColor || 'bg-emerald-400'} ring-1 ring-[#080F22]`}
-                    ></span>
+              {liveCollaborators.length > 0 ? (
+                liveCollaborators.map((user, idx) => (
+                  <div key={user.id || user.socketId || `${user.name}-${idx}`} className="flex items-center gap-2">
+                    <div className="relative">
+                      {user.avatar ? (
+                        <img
+                          src={user.avatar}
+                          alt={user.name}
+                          className="w-6 h-6 rounded-full object-cover ring-1 ring-blue-500/30"
+                        />
+                      ) : (
+                        <div className="w-6 h-6 rounded-full bg-blue-700/80 text-white font-bold text-[10px] flex items-center justify-center ring-1 ring-blue-500/30">
+                          {(user.name || '?').charAt(0).toUpperCase()}
+                        </div>
+                      )}
+                      <span
+                        className={`absolute -bottom-0.5 -right-0.5 w-1.5 h-1.5 rounded-full ${user.statusColor || 'bg-emerald-400'} ring-1 ring-[#080F22]`}
+                      ></span>
+                    </div>
+                    <div className="text-left leading-tight truncate">
+                      <div className="text-xs font-medium text-slate-200 truncate">{user.name}</div>
+                      <div className="text-[10px] text-sky-400 truncate">{user.activity || 'Active'}</div>
+                    </div>
                   </div>
-                  <div className="text-left leading-tight">
-                    <div className="text-xs font-medium text-slate-200">{user.name}</div>
-                    <div className="text-[10px] text-sky-400">{user.activity}</div>
-                  </div>
+                ))
+              ) : (
+                <div className="py-4 px-2 text-center text-[11px] text-slate-400 italic">
+                  No other collaborators in this room right now
                 </div>
-              ))}
+              )}
             </div>
           </div>
 
@@ -599,24 +658,37 @@ export default function WorkspaceWindow({
               ref={chatScrollRef}
               className="flex-1 overflow-y-auto space-y-1.5 pr-1 max-h-[180px] scrollbar-thin"
             >
-              {chatMessages.map((msg, i) => (
-                <div key={msg.id || i} className="flex items-start gap-1.5">
-                  <img
-                    src={msg.avatar || '/assets/avatar-petros.png'}
-                    alt={msg.sender}
-                    className="w-4 h-4 rounded-full object-cover mt-0.5 ring-1 ring-blue-500/20 shrink-0"
-                  />
-                  <div className="flex-1 text-left leading-tight">
-                    <div className="flex items-center gap-1">
-                      <span className="text-[10px] font-semibold text-slate-200">{msg.sender}</span>
-                      <span className="text-[8px] text-slate-500">{msg.time}</span>
+              {chatMessages.length > 0 ? (
+                chatMessages.map((msg, i) => (
+                  <div key={msg.id || i} className="flex items-start gap-1.5">
+                    {msg.avatar ? (
+                      <img
+                        src={msg.avatar}
+                        alt={msg.sender}
+                        className="w-4 h-4 rounded-full object-cover mt-0.5 ring-1 ring-blue-500/20 shrink-0"
+                      />
+                    ) : (
+                      <div className="w-4 h-4 rounded-full bg-blue-700/80 text-white font-bold text-[8px] flex items-center justify-center ring-1 ring-blue-500/20 shrink-0 mt-0.5">
+                        {(msg.sender || '?').charAt(0).toUpperCase()}
+                      </div>
+                    )}
+                    <div className="flex-1 text-left leading-tight">
+                      <div className="flex items-center gap-1">
+                        <span className="text-[10px] font-semibold text-slate-200">{msg.sender}</span>
+                        <span className="text-[8px] text-slate-500">{msg.time}</span>
+                      </div>
+                      <p className="text-[10px] text-slate-300 bg-[#0C152E] px-2 py-0.5 rounded border border-blue-950/60 mt-0.5 inline-block leading-snug break-words">
+                        {msg.text}
+                      </p>
                     </div>
-                    <p className="text-[10px] text-slate-300 bg-[#0C152E] px-2 py-0.5 rounded border border-blue-950/60 mt-0.5 inline-block leading-snug">
-                      {msg.text}
-                    </p>
                   </div>
+                ))
+              ) : (
+                <div className="h-full min-h-[100px] flex flex-col items-center justify-center text-center p-3 text-slate-500">
+                  <p className="text-[11px]">No messages yet.</p>
+                  <p className="text-[10px] text-slate-600">Start the conversation with your team!</p>
                 </div>
-              ))}
+              )}
             </div>
 
             {/* Chat Input Field */}

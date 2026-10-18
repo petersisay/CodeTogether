@@ -108,6 +108,18 @@ export default function App() {
     }
   };
 
+  const handleSignOut = () => {
+    localStorage.removeItem('codetogether_token');
+    localStorage.removeItem('codetogether_user');
+    setCurrentUser(null);
+    if (socket) {
+      socket.auth = { token: null };
+      socket.emit('auth:authenticate', { token: null });
+      socket.disconnect();
+      socket.connect();
+    }
+  };
+
   const handleNavigateToMeeting = (meetingId, mode = 'video') => {
     if (!currentUser) {
       setIsAuthOpen(true);
@@ -177,6 +189,7 @@ export default function App() {
               connected={connected}
               currentUser={currentUser}
               onOpenAuth={() => setIsAuthOpen(true)}
+              onSignOut={handleSignOut}
               onNavigateToMeeting={handleNavigateToMeeting}
             />
           </div>
