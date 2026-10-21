@@ -14,7 +14,7 @@
   <a href="https://code-together-weld.vercel.app/"><img src="https://img.shields.io/badge/Frontend-Vercel%20Live-black?style=for-the-badge&logo=vercel" alt="Vercel Deployment" /></a>
   <a href="https://codetogether-v1fo.onrender.com/api/health"><img src="https://img.shields.io/badge/Backend-Render%20Live-46E3B7?style=for-the-badge&logo=render&logoColor=black" alt="Render Backend" /></a>
   <a href="https://www.mongodb.com/atlas"><img src="https://img.shields.io/badge/Database-MongoDB%20Atlas-47A248?style=for-the-badge&logo=mongodb&logoColor=white" alt="MongoDB Atlas" /></a>
-  <img src="https://img.shields.io/badge/Tests-32%20Passing-brightgreen?style=for-the-badge&logo=node.js" alt="32 Tests Passing" />
+  <img src="https://img.shields.io/badge/Tests-33%20Passing-brightgreen?style=for-the-badge&logo=node.js" alt="33 Tests Passing" />
   <img src="https://img.shields.io/badge/License-MIT-blue?style=for-the-badge" alt="License MIT" />
 </p>
 
@@ -249,7 +249,38 @@ CodeTogether/
 3. **Socket.IO Handshake Auth**: Enforces JWT verification during WebSocket connection. Unauthenticated sockets cannot join collaboration rooms.
 4. **Sender Identity Derivation**: Message sender and avatar are strictly derived from verified server session tokens, eliminating identity impersonation.
 5. **Path Traversal Sanitization**: Project export automatically sanitizes all file paths, stripping null bytes, Windows drive roots, and `..` traversal sequences.
-6. **Strict CORS Policy**: Whitelists authorized origins (`localhost:5173` and `https://code-together-weld.vercel.app`).
+6. **Private Room Authorization**: Stored rooms with private visibility or restricted collaborator lists enforce strict creator/whitelist validation across file mutations, WebSocket room subscriptions, and project ZIP exports.
+7. **Strict CORS Policy**: Whitelists authorized origins (`localhost:5173` and `https://code-together-weld.vercel.app`).
+8. **No Duplicate Chat Messages**: Single-dispatch WebSocket persistence eliminates duplicate entries from simultaneous REST/Socket writes.
+9. **Zero Demo Artifacts**: Eliminated all mock chat history, fake collaborator arrays, simulated online counts, and hardcoded demo identities.
+
+---
+
+## 🧪 Automated Test Suite (33 Tests Passing)
+
+CodeTogether features 33 comprehensive unit and integration tests covering Google verification, authorization gates, real-time synchronization, WebRTC signaling, and project export.
+
+```bash
+# Run backend test suite
+npm test --prefix server
+
+# Run client production build verification
+npm run build --prefix client
+```
+
+### Verified Test Matrix:
+- ✔️ Google ID token verification (valid signature, audience matching, issuer checking)
+- ✔️ Token expiration, untrusted issuer, and unverified email rejection (401 / 403)
+- ✔️ Account takeover prevention (protects existing local accounts)
+- ✔️ JWT session generation and cryptographic verification
+- ✔️ Unauthenticated access rejection for mutating room and file routes (401)
+- ✔️ Unauthenticated access rejection for project export route (401)
+- ✔️ Authenticated project export endpoint sanitizing paths and returning stored files (200)
+- ✔️ Private room export authorization enforcement rejecting unauthorized users (403)
+- ✔️ Unauthenticated socket rejection on `room:join`
+- ✔️ Live presence broadcasting derived from active socket sessions
+- ✔️ Code change broadcasting with collision detection & version sequences
+- ✔️ WebRTC signaling (SDP offer/answer forwarding, ICE candidate routing, media status toggling)lists authorized origins (`localhost:5173` and `https://code-together-weld.vercel.app`).
 7. **No Duplicate Chat Messages**: Single-dispatch WebSocket persistence eliminates duplicate entries from simultaneous REST/Socket writes.
 8. **Zero Demo Artifacts**: Eliminated all mock chat history, fake collaborator arrays, simulated online counts, and hardcoded demo identities.
 
