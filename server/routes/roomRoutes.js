@@ -7,6 +7,21 @@ import { getRoomOnlineCount } from '../socket.js';
 
 const router = express.Router();
 
+// Room authorization helper: checks private rooms and authorized user lists
+export function isUserAuthorizedForRoom(room, username) {
+  if (!room) return false;
+  if (!room.isPrivate && (!room.authorizedUsers || room.authorizedUsers.length === 0)) {
+    return true;
+  }
+  if (room.creator && room.creator === username) {
+    return true;
+  }
+  if (Array.isArray(room.authorizedUsers) && room.authorizedUsers.includes(username)) {
+    return true;
+  }
+  return false;
+}
+
 
 // Default seed rooms and files matching reference image
 export const initialRoomData = {
@@ -280,6 +295,9 @@ router.post('/:name/files', authenticateToken, async (req, res) => {
     if (isConnected) {
       const dbRoom = await Room.findOne({ name });
       if (dbRoom) {
+        if (!isUserAuthorizedForRoom(dbRoom, req.user.username)) {
+          return res.status(403).json({ error: 'Access denied: You are not authorized to modify this private room' });
+        }
         const exists = dbRoom.files.some((f) => f.filename === cleanFilename);
         if (exists) {
           return res.status(409).json({ error: 'File already exists in this room' });
@@ -327,6 +345,9 @@ router.put('/:name/files/:filename', authenticateToken, async (req, res) => {
     if (isConnected) {
       const dbRoom = await Room.findOne({ name });
       if (dbRoom) {
+        if (!isUserAuthorizedForRoom(dbRoom, req.user.username)) {
+          return res.status(403).json({ error: 'Access denied: You are not authorized to modify this private room' });
+        }
         const file = dbRoom.files.find((f) => f.filename === filename);
         if (file) {
           file.content = content;
@@ -362,6 +383,9 @@ router.delete('/:name/files/:filename', authenticateToken, async (req, res) => {
     if (isConnected) {
       const dbRoom = await Room.findOne({ name });
       if (dbRoom) {
+        if (!isUserAuthorizedForRoom(dbRoom, req.user.username)) {
+          return res.status(403).json({ error: 'Access denied: You are not authorized to modify this private room' });
+        }
         dbRoom.files = dbRoom.files.filter((f) => f.filename !== filename);
         await dbRoom.save();
         return res.json({ message: 'File deleted successfully', filename });
@@ -464,6 +488,11 @@ router.get('/:name/export', authenticateToken, async (req, res) => {
 
     if (!room) {
       return res.status(404).json({ error: 'Room not found' });
+    }
+
+    // Verify room authorization: disallow unauthorized export of private project files
+    if (!isUserAuthorizedForRoom(room, req.user.username)) {
+      return res.status(403).json({ error: 'Access denied: You are not authorized to export files from this private room' });
     }
 
     // Sanitize file list to ensure no path traversal or directory escaping

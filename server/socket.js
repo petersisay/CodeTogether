@@ -2,7 +2,7 @@ import Message from './models/Message.js';
 import Room from './models/Room.js';
 import mongoose from 'mongoose';
 import { verifyToken } from './middleware/auth.js';
-import { initialRoomData } from './routes/roomRoutes.js';
+import { initialRoomData, isUserAuthorizedForRoom } from './routes/roomRoutes.js';
 
 // Map of active rooms -> Map of socket.id -> user info
 const activeRoomSessions = new Map();
@@ -94,6 +94,23 @@ export function setupSocket(io) {
         });
       }
 
+      // Verify room-level authorization for private rooms
+      const isConnected = mongoose.connection.readyState === 1;
+      let roomDoc = null;
+      if (isConnected) {
+        try {
+          roomDoc = await Room.findOne({ name: room }).lean();
+        } catch (e) {}
+      } else if (initialRoomData[room]) {
+        roomDoc = initialRoomData[room];
+      }
+
+      if (roomDoc && !isUserAuthorizedForRoom(roomDoc, socket.user.username)) {
+        return socket.emit('error:unauthorized', {
+          message: 'Access denied: You are not authorized to join this private room',
+        });
+      }
+
       // Leave previous room if any
       if (currentRoom) {
         socket.leave(currentRoom);
@@ -127,7 +144,6 @@ export function setupSocket(io) {
 
       // Send initial room files to client
       let roomFiles = {};
-      const isConnected = mongoose.connection.readyState === 1;
 
       if (isConnected) {
         try {

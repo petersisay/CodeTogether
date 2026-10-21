@@ -133,5 +133,25 @@ test('Room & File Authorization API Tests', async (t) => {
       assert.ok(!f.filename.startsWith('/'), 'Path must be relative');
     });
   });
+
+  await t.test('GET /api/rooms/:name/export fails with 403 when user is not authorized for a private room', async () => {
+    // Seed private room in memory or db
+    const { initialRoomData } = await import('../routes/roomRoutes.js');
+    initialRoomData['Confidential_Private_Project'] = {
+      name: 'Confidential_Private_Project',
+      description: 'Private research project',
+      creator: 'SecretAdmin',
+      isPrivate: true,
+      authorizedUsers: ['SecretAdmin'],
+      files: [{ filename: 'secret.js', content: 'console.log("top secret");' }],
+    };
+
+    const res = await fetch(`${baseUrl}/Confidential_Private_Project/export`, {
+      headers: { Authorization: `Bearer ${validToken}` }, // User is 'AuthorizedTester', not 'SecretAdmin'
+    });
+    assert.strictEqual(res.status, 403, 'Should reject export of private room to unauthorized user');
+    const data = await res.json();
+    assert.ok(data.error.includes('Access denied'), 'Error message should inform access denied');
+  });
 });
 
