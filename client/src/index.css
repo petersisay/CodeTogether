@@ -75,3 +75,135 @@
   -webkit-overflow-scrolling: touch;
 }
 
+/* Animated Hero Background Motion & Glowing Pulses */
+@keyframes heroDrift {
+  0% {
+    transform: scale(1.02) translate(0, 0);
+  }
+  50% {
+    transform: scale(1.05) translate(-0.8%, -0.6%);
+  }
+  100% {
+    transform: scale(1.03) translate(0.6%, 0.4%);
+  }
+}
+
+@keyframes heroPulseGlow {
+  0% {
+    opacity: 0.18;
+    transform: scale(0.96) translate(0, 0);
+  }
+  50% {
+    opacity: 0.35;
+    transform: scale(1.06) translate(1%, -1%);
+  }
+  100% {
+    opacity: 0.22;
+    transform: scale(0.98) translate(-1%, 1%);
+  }
+}
+
+@keyframes heroPulseGlowAlt {
+  0% {
+    opacity: 0.15;
+    transform: scale(1.04) translate(0, 0);
+  }
+  50% {
+    opacity: 0.32;
+    transform: scale(0.95) translate(-1%, 1%);
+  }
+  100% {
+    opacity: 0.2;
+    transform: scale(1.02) translate(1%, -1%);
+  }
+}
+
+@keyframes heroFloatParticle {
+  0% {
+    transform: translateY(0px) translateX(0px);
+    opacity: 0;
+  }
+  15% {
+    opacity: 0.7;
+  }
+  85% {
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateY(-90px) translateX(25px);
+    opacity: 0;
+  }
+}
+
+.hero-bg-drift {
+  animation: heroDrift 22s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+.hero-pulse-glow {
+  animation: heroPulseGlow 9s ease-in-out infinite alternate;
+  will-change: transform, opacity;
+}
+
+.hero-pulse-glow-alt {
+  animation: heroPulseGlowAlt 11s ease-in-out infinite alternate;
+  will-change: transform, opacity;
+}
+
+.hero-particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 9999px;
+  background-color: #38bdf8;
+  box-shadow: 0 0 12px 2px rgba(56, 189, 248, 0.8);
+  pointer-events: none;
+  animation: heroFloatParticle 10s infinite linear;
+}
+
+.hero-particle-1 {
+  bottom: 25%;
+  left: 18%;
+  animation-duration: 9s;
+  animation-delay: 0s;
+}
+
+.hero-particle-2 {
+  bottom: 30%;
+  right: 22%;
+  width: 5px;
+  height: 5px;
+  animation-duration: 12s;
+  animation-delay: 3s;
+}
+
+.hero-particle-3 {
+  bottom: 18%;
+  left: 45%;
+  width: 3px;
+  height: 3px;
+  animation-duration: 8s;
+  animation-delay: 1.5s;
+}
+
+.hero-particle-4 {
+  bottom: 35%;
+  right: 38%;
+  width: 4px;
+  height: 4px;
+  animation-duration: 11s;
+  animation-delay: 5s;
+}
+
+/* Reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .hero-bg-drift,
+  .hero-pulse-glow,
+  .hero-pulse-glow-alt,
+  .hero-particle {
+    animation: none !important;
+    transform: none !important;
+  }
+}
+
+
