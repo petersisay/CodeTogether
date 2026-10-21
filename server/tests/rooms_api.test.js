@@ -112,4 +112,26 @@ test('Room & File Authorization API Tests', async (t) => {
     });
     assert.strictEqual(res.status, 200, 'Should delete file with valid token');
   });
+
+  await t.test('GET /api/rooms/:name/export fails with 401 when unauthenticated', async () => {
+    const res = await fetch(`${baseUrl}/Authorized_Test_Room/export`);
+    assert.strictEqual(res.status, 401, 'Should reject unauthenticated room export');
+  });
+
+  await t.test('GET /api/rooms/:name/export succeeds with 200 and returns safe project files when authenticated', async () => {
+    const res = await fetch(`${baseUrl}/Authorized_Test_Room/export`, {
+      headers: { Authorization: `Bearer ${validToken}` },
+    });
+    assert.strictEqual(res.status, 200, 'Should export project with valid token');
+    const data = await res.json();
+    assert.strictEqual(data.room, 'Authorized_Test_Room');
+    assert.ok(Array.isArray(data.files), 'Files should be an array');
+    assert.ok(data.files.length > 0, 'Exported files should not be empty');
+    // Ensure all file paths are safe
+    data.files.forEach((f) => {
+      assert.ok(!f.filename.includes('..'), 'Path must not contain traversal elements');
+      assert.ok(!f.filename.startsWith('/'), 'Path must be relative');
+    });
+  });
 });
+

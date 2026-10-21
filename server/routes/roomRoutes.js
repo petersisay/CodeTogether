@@ -448,5 +448,53 @@ router.post('/:name/messages', authenticateToken, async (req, res) => {
   res.status(201).json(messageObj);
 });
 
+// 9. EXPORT ROOM PROJECT FILES (Authenticated)
+router.get('/:name/export', authenticateToken, async (req, res) => {
+  const { name } = req.params;
+
+  try {
+    const isConnected = mongoose.connection.readyState === 1;
+    let room = null;
+
+    if (isConnected) {
+      room = await Room.findOne({ name }).lean();
+    } else if (initialRoomData[name]) {
+      room = initialRoomData[name];
+    }
+
+    if (!room) {
+      return res.status(404).json({ error: 'Room not found' });
+    }
+
+    // Sanitize file list to ensure no path traversal or directory escaping
+    const safeFiles = (room.files || []).map((f) => {
+      const cleanPath = (f.filename || '')
+        .replace(/\0/g, '')
+        .replace(/^[a-zA-Z]:/, '')
+        .replace(/\\/g, '/')
+        .split('/')
+        .filter((part) => part && part !== '.' && part !== '..')
+        .join('/');
+
+      return {
+        filename: cleanPath || 'unnamed_file',
+        content: f.content || '',
+        language: f.language || 'plaintext',
+      };
+    });
+
+    return res.json({
+      room: name,
+      exportedAt: new Date().toISOString(),
+      requestedBy: req.user.username,
+      fileCount: safeFiles.length,
+      files: safeFiles,
+    });
+  } catch (err) {
+    console.error('[Room Export Error]:', err);
+    res.status(500).json({ error: 'Failed to export room files' });
+  }
+});
+
 export default router;
 

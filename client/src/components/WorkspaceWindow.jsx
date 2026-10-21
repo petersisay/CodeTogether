@@ -24,7 +24,12 @@ import {
   PanelRightOpen,
   MessageSquare,
   Users,
+  Download,
+  Loader2,
+  FolderArchive,
+  CheckCircle,
 } from 'lucide-react';
+import JSZip from 'jszip';
 import highlightCode from './SyntaxHighlighter.jsx';
 import CreateRoomModal from './CreateRoomModal.jsx';
 import CreateFileModal from './CreateFileModal.jsx';
@@ -52,6 +57,11 @@ export default function WorkspaceWindow({
   const [savedStatus, setSavedStatus] = useState(false);
   const [conflictAlert, setConflictAlert] = useState(null);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+
+  // Project ZIP Export State
+  const [isExporting, setIsExporting] = useState(false);
+  const [exportModalData, setExportModalData] = useState(null);
+  const [exportError, setExportError] = useState(null);
 
   // Sidebar visibility toggles for desktop
   const [showLeftSidebar, setShowLeftSidebar] = useState(true);
@@ -307,6 +317,132 @@ export default function WorkspaceWindow({
     } catch (err) {}
   };
 
+  // 4. Export CodeTogether Project to Local ZIP Archive
+  const handleExportProject = async () => {
+    if (!currentUser) {
+      onOpenAuth?.('login');
+      return;
+    }
+
+    if (!activeRoom) {
+      setExportError('No active project room selected.');
+      return;
+    }
+
+    setIsExporting(true);
+    setExportError(null);
+
+    try {
+      // Flush unsaved edits to server to guarantee the export snapshot is 100% current
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+      }
+      if (files[activeTab] !== undefined) {
+        try {
+          await fetch(`${backendUrl}/api/rooms/${activeRoom}/files/${activeTab}`, {
+            method: 'PUT',
+            headers: getAuthHeaders(),
+            body: JSON.stringify({ content: files[activeTab] }),
+          });
+        } catch (e) {
+          // Local memory state holds the latest edits
+        }
+      }
+
+      // Fetch verified room files from export endpoint
+      const token = localStorage.getItem('codetogether_token');
+      const res = await fetch(`${backendUrl}/api/rooms/${activeRoom}/export`, {
+        headers: {
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+      });
+
+      let exportFiles = {};
+      if (res.ok) {
+        const data = await res.json();
+        if (data.files && Array.isArray(data.files)) {
+          data.files.forEach((f) => {
+            exportFiles[f.filename] = f.content;
+          });
+        }
+      } else {
+        exportFiles = { ...files };
+      }
+
+      // Overlay active local files
+      Object.keys(files).forEach((fname) => {
+        exportFiles[fname] = files[fname];
+      });
+
+      const fileEntries = Object.entries(exportFiles);
+      if (fileEntries.length === 0) {
+        throw new Error('This project room has no files to export.');
+      }
+
+      const zip = new JSZip();
+
+      // Path traversal sanitizer
+      const sanitizePath = (rawPath) => {
+        return rawPath
+          .replace(/\0/g, '')
+          .replace(/^[a-zA-Z]:/, '')
+          .replace(/\\/g, '/')
+          .split('/')
+          .filter((segment) => segment && segment !== '.' && segment !== '..')
+          .join('/');
+      };
+
+      fileEntries.forEach(([rawName, content]) => {
+        const safeName = sanitizePath(rawName);
+        if (safeName) {
+          zip.file(safeName, content ?? '');
+        }
+      });
+
+      const cleanRoomName = activeRoom.replace(/[^a-zA-Z0-9_-]/g, '_');
+      const instructionsContent = `# ${activeRoom} — Exported from CodeTogether\n\n` +
+        `Export Date: ${new Date().toLocaleString()}\n` +
+        `Project Room: ${activeRoom}\n` +
+        `Exported By: ${currentUser.username}\n\n` +
+        `## How to Open in Local IDE\n\n` +
+        `### Option 1: Visual Studio Code (VS Code)\n` +
+        `1. Extract this ZIP archive into a local directory:\n` +
+        `   mkdir ${cleanRoomName} && cd ${cleanRoomName}\n` +
+        `2. Open the folder in VS Code:\n` +
+        `   code .\n\n` +
+        `### Option 2: IntelliJ IDEA / WebStorm\n` +
+        `1. Extract the ZIP archive.\n` +
+        `2. Choose File -> Open and select the extracted folder.\n\n` +
+        `> **Important Notice**:\n` +
+        `> This archive is a one-way snapshot of your CodeTogether project.\n` +
+        `> Changes made locally in your external IDE do not automatically sync back to CodeTogether.\n`;
+
+      zip.file('README_LOCAL_SETUP.md', instructionsContent);
+
+      const blob = await zip.generateAsync({ type: 'blob' });
+      const downloadFilename = `${cleanRoomName}-source.zip`;
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = downloadFilename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      setExportModalData({
+        room: activeRoom,
+        filename: downloadFilename,
+        fileCount: fileEntries.length,
+      });
+    } catch (err) {
+      console.error('Project export failed:', err);
+      setExportError(err.message || 'Failed to export project files.');
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   const currentCode = files[activeTab] || '';
   const lines = currentCode.split('\n');
   const liveCollaborators = Array.isArray(collaborators) ? collaborators : [];
@@ -395,6 +531,24 @@ export default function WorkspaceWindow({
             >
               <Video className="w-3.5 h-3.5 text-cyan-200" />
               <span className="hidden xl:inline text-xs">Video Call</span>
+            </button>
+            <button
+              onClick={handleExportProject}
+              disabled={isExporting}
+              title="Export Project Files as ZIP for Local IDE (VS Code)"
+              className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-blue-950/80 hover:bg-blue-900/70 border border-blue-700/60 hover:border-blue-500/80 text-xs font-medium text-sky-300 hover:text-white transition-all cursor-pointer disabled:opacity-50"
+            >
+              {isExporting ? (
+                <>
+                  <Loader2 className="w-3.5 h-3.5 animate-spin text-sky-400" />
+                  <span className="hidden xl:inline text-xs">Exporting...</span>
+                </>
+              ) : (
+                <>
+                  <Download className="w-3.5 h-3.5 text-sky-400" />
+                  <span className="hidden xl:inline text-xs">Export ZIP</span>
+                </>
+              )}
             </button>
           </div>
 
@@ -555,15 +709,26 @@ export default function WorkspaceWindow({
               <div className="space-y-3">
                 <div className="flex items-center justify-between px-1 text-xs font-semibold text-slate-300">
                   <span className="uppercase tracking-wider text-[10px] text-slate-400">Project Files</span>
-                  <button
-                    id="btn-create-file-trigger"
-                    title="Add File"
-                    onClick={() => setIsCreateFileOpen(true)}
-                    className="p-1 rounded-lg text-sky-400 hover:text-white hover:bg-blue-900/50 cursor-pointer flex items-center gap-1 text-[11px]"
-                  >
-                    <Plus className="w-3.5 h-3.5" />
-                    <span>New File</span>
-                  </button>
+                  <div className="flex items-center gap-1">
+                    <button
+                      onClick={handleExportProject}
+                      disabled={isExporting}
+                      title="Download Project ZIP"
+                      className="p-1 rounded-lg text-slate-400 hover:text-sky-300 hover:bg-blue-900/50 cursor-pointer flex items-center gap-1 text-[11px] transition-colors"
+                    >
+                      <Download className="w-3.5 h-3.5 text-sky-400" />
+                      <span>ZIP</span>
+                    </button>
+                    <button
+                      id="btn-create-file-trigger"
+                      title="Add File"
+                      onClick={() => setIsCreateFileOpen(true)}
+                      className="p-1 rounded-lg text-sky-400 hover:text-white hover:bg-blue-900/50 cursor-pointer flex items-center gap-1 text-[11px] transition-colors"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                      <span>New File</span>
+                    </button>
+                  </div>
                 </div>
 
                 <div className="space-y-1">
@@ -941,6 +1106,70 @@ export default function WorkspaceWindow({
           }
         }}
       />
+
+      {/* Export Success & IDE Instructions Modal */}
+      {exportModalData && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-in fade-in duration-150">
+          <div className="bg-[#091124] border border-blue-600/40 rounded-2xl p-5 sm:p-6 max-w-md w-full shadow-2xl text-left relative">
+            <div className="flex items-center gap-3 mb-4 pb-3 border-b border-blue-900/40">
+              <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shrink-0">
+                <FolderArchive className="w-5 h-5" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h3 className="text-base font-bold text-white truncate">Project Exported Successfully</h3>
+                <p className="text-xs text-sky-300 font-mono mt-0.5 truncate">{exportModalData.filename}</p>
+              </div>
+            </div>
+
+            <div className="space-y-3 text-xs text-slate-300 mb-5 leading-relaxed">
+              <div className="p-3.5 rounded-xl bg-[#060B18] border border-blue-900/40 space-y-2">
+                <div className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">How to Open in VS Code</div>
+                <ol className="list-decimal list-inside space-y-1 text-slate-300">
+                  <li>Extract the downloaded <span className="font-mono text-sky-300 font-semibold">{exportModalData.filename}</span> file on your machine.</li>
+                  <li>Open terminal and navigate to the extracted directory:</li>
+                  <pre className="p-2 rounded bg-black/60 text-emerald-400 font-mono text-[11px] overflow-x-auto mt-1 select-all">cd {exportModalData.room.replace(/[^a-zA-Z0-9_-]/g, '_')}</pre>
+                  <li>Launch VS Code with:</li>
+                  <pre className="p-2 rounded bg-black/60 text-emerald-400 font-mono text-[11px] overflow-x-auto mt-1 select-all">code .</pre>
+                </ol>
+              </div>
+
+              <div className="text-[11px] text-slate-400 italic bg-blue-950/30 p-2.5 rounded-lg border border-blue-900/30">
+                ℹ️ Note: This archive is a one-way export snapshot. Local edits in your external IDE do not automatically sync back to CodeTogether.
+              </div>
+            </div>
+
+            <div className="flex justify-end">
+              <button
+                onClick={() => setExportModalData(null)}
+                className="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-medium text-xs transition-colors cursor-pointer"
+              >
+                Got It
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Export Error Alert Modal */}
+      {exportError && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-in fade-in duration-150">
+          <div className="bg-[#091124] border border-red-500/40 rounded-2xl p-5 sm:p-6 max-w-sm w-full shadow-2xl text-left">
+            <div className="flex items-center gap-3 mb-3 text-red-400">
+              <AlertTriangle className="w-5 h-5 shrink-0" />
+              <h3 className="text-sm font-bold text-white">Project Export Failed</h3>
+            </div>
+            <p className="text-xs text-slate-300 mb-4">{exportError}</p>
+            <div className="flex justify-end">
+              <button
+                onClick={() => setExportError(null)}
+                className="px-4 py-1.5 rounded-xl bg-red-900/40 hover:bg-red-800/60 border border-red-500/50 text-red-200 text-xs font-medium cursor-pointer"
+              >
+                Dismiss
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
