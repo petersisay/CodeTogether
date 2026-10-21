@@ -60,3 +60,18 @@
 .panel-border-subtle {
   border: 1px solid rgba(30, 58, 138, 0.35);
 }
+
+/* Mobile responsive momentum scrolling and touch targets */
+@supports (height: 100dvh) {
+  .h-dvh {
+    height: 100dvh;
+  }
+  .min-h-dvh {
+    min-height: 100dvh;
+  }
+}
+
+.touch-scroll {
+  -webkit-overflow-scrolling: touch;
+}
+

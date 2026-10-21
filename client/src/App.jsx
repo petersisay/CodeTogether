@@ -181,7 +181,7 @@ export default function App() {
   // Route 2: Dedicated Full-Screen Collaborative Coding Workspace (/workspace)
   if (currentPath.startsWith('/workspace')) {
     return (
-      <div className="h-screen w-full bg-[#070B14] overflow-hidden">
+      <div className="h-screen h-dvh w-full bg-[#070B14] overflow-hidden">
         <WorkspaceWindow
           activeRoom={activeRoom}
           setActiveRoom={setActiveRoom}

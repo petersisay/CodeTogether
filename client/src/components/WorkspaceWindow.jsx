@@ -312,7 +312,7 @@ export default function WorkspaceWindow({
   const liveCollaborators = Array.isArray(collaborators) ? collaborators : [];
 
   return (
-    <div className="w-full h-screen flex flex-col bg-[#070B14] text-slate-100 overflow-hidden text-left select-text">
+    <div className="w-full h-screen h-dvh flex flex-col bg-[#070B14] text-slate-100 overflow-hidden text-left select-text">
       {/* =========================================================================
           TOP WORKSPACE TOOLBAR (Height: 56px)
          ========================================================================= */}
