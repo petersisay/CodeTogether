@@ -302,7 +302,23 @@ The following enhancements are optional future roadmap items for when the platfo
 
 ---
 
-## 12. Final Git & Delivery Metadata
+## 12. Documentation Index & Specifications
+
+The complete technical documentation suite is organized across dedicated guides:
+
+| Document | Path | Scope |
+| :--- | :--- | :--- |
+| **System Architecture** | [`docs/ARCHITECTURE.md`](ARCHITECTURE.md) | Topology, data flows, operational sequence model, WebRTC mesh sequence, and security boundaries. |
+| **API Specification** | [`docs/API_REFERENCE.md`](API_REFERENCE.md) | Exhaustive REST endpoint contracts, schemas, status codes, Socket.IO real-time events, and WebRTC protocols. |
+| **Frontend Guide** | [`client/README.md`](../client/README.md) | React 19 architecture, component hierarchy, WebP asset optimizations, and Vercel SPA routing. |
+| **Backend Guide** | [`server/README.md`](../server/README.md) | Express routes, Socket.IO hub, dual persistence, Google OAuth verification, and Render deployment. |
+| **Security Policy** | [`SECURITY.md`](../SECURITY.md) | Threat model, OWASP Top 10 defenses, token security, and vulnerability disclosure protocol. |
+| **Contributing Guide** | [`CONTRIBUTING.md`](../CONTRIBUTING.md) | Development workflow, coding style, commit conventions, and pull request procedures. |
+| **Root Guide** | [`README.md`](../README.md) | Main project overview, live links, showcase screenshots, quick start, and benchmark matrix. |
+
+---
+
+## 13. Final Git & Delivery Metadata
 
 - **Branch**: `main`
 - **Remote**: `origin` (`https://github.com/petersisay/CodeTogether.git`)

@@ -280,35 +280,6 @@ npm run build --prefix client
 - ✔️ Unauthenticated socket rejection on `room:join`
 - ✔️ Live presence broadcasting derived from active socket sessions
 - ✔️ Code change broadcasting with collision detection & version sequences
-- ✔️ WebRTC signaling (SDP offer/answer forwarding, ICE candidate routing, media status toggling)lists authorized origins (`localhost:5173` and `https://code-together-weld.vercel.app`).
-7. **No Duplicate Chat Messages**: Single-dispatch WebSocket persistence eliminates duplicate entries from simultaneous REST/Socket writes.
-8. **Zero Demo Artifacts**: Eliminated all mock chat history, fake collaborator arrays, simulated online counts, and hardcoded demo identities.
-
----
-
-## 🧪 Automated Test Suite (32 Tests Passing)
-
-CodeTogether features 32 comprehensive unit and integration tests covering Google verification, authorization gates, real-time synchronization, WebRTC signaling, and project export.
-
-```bash
-# Run backend test suite
-npm test --prefix server
-
-# Run client production build verification
-npm run build --prefix client
-```
-
-### Verified Test Matrix:
-- ✔️ Google ID token verification (valid signature, audience matching, issuer checking)
-- ✔️ Token expiration, untrusted issuer, and unverified email rejection (401 / 403)
-- ✔️ Account takeover prevention (protects existing local accounts)
-- ✔️ JWT session generation and cryptographic verification
-- ✔️ Unauthenticated access rejection for mutating room and file routes (401)
-- ✔️ Unauthenticated access rejection for project export route (401)
-- ✔️ Authenticated project export endpoint sanitizing paths and returning stored files (200)
-- ✔️ Unauthenticated socket rejection on `room:join`
-- ✔️ Live presence broadcasting derived from active socket sessions
-- ✔️ Code change broadcasting with collision detection & version sequences
 - ✔️ WebRTC signaling (SDP offer/answer forwarding, ICE candidate routing, media status toggling)
 
 ---
@@ -385,12 +356,28 @@ Open `http://localhost:5173` in your browser.
 | **JWT Token Generation** | **0.087 ms** per token (~11,400 ops/sec) | ⚡ High-throughput session auth |
 | **Vite Client Production Build** | **1.35 s** build time | ⚡ Rapid CI/CD deployment |
 | **Hero Background Asset (WebP)** | **61.8 kB** (95% quality) | ⚡ Ultra-fast LCP paint |
-| **Automated Test Suite** | **32 / 32 tests passing** | ⚡ 100% test coverage |
+| **Automated Test Suite** | **33 / 33 tests passing** | ⚡ 100% test coverage |
 
 Run the benchmark suite anytime with:
 ```bash
 npm run benchmark --prefix server
 ```
+
+---
+
+## 📚 Documentation & Technical Guides
+
+CodeTogether provides comprehensive, modular documentation across every architectural layer:
+
+| Document | Description |
+| :--- | :--- |
+| 📘 [**System Architecture (`docs/ARCHITECTURE.md`)**](docs/ARCHITECTURE.md) | In-depth topology, operational concurrency, WebRTC mesh signaling sequence, and security boundary diagrams. |
+| 📗 [**REST & WebSocket API Reference (`docs/API_REFERENCE.md`)**](docs/API_REFERENCE.md) | Exhaustive API reference with schemas, query parameters, status codes, Socket.IO events, and WebRTC protocols. |
+| 💻 [**Frontend Client Guide (`client/README.md`)**](client/README.md) | Component architecture, state management, WebP asset optimizations, Tailwind CSS v4, and Vercel hosting setup. |
+| ⚙️ [**Backend Server Guide (`server/README.md`)**](server/README.md) | Express API routing, Socket.IO hub, Mongoose schemas, Google OAuth verification, and Render deployment. |
+| 🛡️ [**Security Policy & Threat Model (`SECURITY.md`)**](SECURITY.md) | Vulnerability reporting protocol, OWASP Top 10 hardening, token security, and path traversal defenses. |
+| 🤝 [**Contributing Guidelines (`CONTRIBUTING.md`)**](CONTRIBUTING.md) | Coding style, branch naming, pull request guidelines, commit conventions, and development environment setup. |
+| 📄 [**Final Production Handoff Report (`docs/FINAL_PROJECT_REPORT.md`)**](docs/FINAL_PROJECT_REPORT.md) | Complete audit report, benchmark results, production sign-off, and handoff documentation. |
 
 ---
 
