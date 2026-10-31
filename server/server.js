@@ -14,30 +14,17 @@ const app = express();
 const server = http.createServer(app);
 
 const PORT = process.env.PORT || 5000;
-const allowedOrigins = [
-   'http://localhost:5173',
-   'http://127.0.0.1:5173',
-   'http://localhost:3000',
-   'http://127.0.0.1:3000',
-   'http://localhost:4173',
-   'http://127.0.0.1:4173',
-   process.env.CLIENT_URL,
-].filter(Boolean);
+
+import { isOriginAllowed } from './utils/corsUtil.js';
 
 // Middlewares
 app.use(
   cors({
     origin: (origin, callback) => {
-      // Allow requests with no origin (like mobile apps, curl, server-to-server)
-      if (!origin) return callback(null, true);
-      if (allowedOrigins.includes(origin)) {
+      if (isOriginAllowed(origin)) {
         return callback(null, true);
       }
-      if (process.env.NODE_ENV !== 'production') {
-        // In dev, log and allow local network origins
-        return callback(null, true);
-      }
-      return callback(new Error(`CORS Error: Origin ${origin} not permitted`));
+      return callback(null, false);
     },
     credentials: true,
   })
@@ -65,11 +52,20 @@ app.get('/', (req, res) => {
   res.send('CodeTogether Backend API & WebSocket Server is Running.');
 });
 
+// Global error handling middleware to always return JSON rather than raw HTML 500
+app.use((err, req, res, next) => {
+  console.error('[Server Error Handler]:', err);
+  const status = err.status || 500;
+  res.status(status).json({
+    error: err.message || 'Internal Server Error',
+  });
+});
+
 // Socket.IO Setup with strict CORS matching allowedOrigins
 const io = new Server(server, {
   cors: {
     origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin) || process.env.NODE_ENV !== 'production') {
+      if (isOriginAllowed(origin)) {
         return callback(null, true);
       }
       return callback(new Error(`Socket CORS Error: Origin ${origin} not permitted`));
