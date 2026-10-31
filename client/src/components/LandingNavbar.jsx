@@ -35,14 +35,14 @@ export default function LandingNavbar({
           href="/"
           className="flex items-center gap-2.5 group cursor-pointer"
         >
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-600 to-sky-500 p-[1px] shadow-[0_0_15px_rgba(37,99,235,0.35)] transition-transform group-hover:scale-105">
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-600 via-indigo-600 to-cyan-400 p-[1px] shadow-[0_0_20px_rgba(99,102,241,0.4)] transition-transform group-hover:scale-105">
             <div className="w-full h-full rounded-[11px] bg-[#0A1226] flex items-center justify-center">
-              <span className="font-code font-bold text-sm text-sky-400">&lt;/&gt;</span>
+              <span className="font-code font-bold text-sm text-cyan-300">&lt;/&gt;</span>
             </div>
           </div>
           <div className="flex flex-col text-left">
             <span className="font-bold text-base tracking-tight text-white flex items-center">
-              Code<span className="text-[#38BDF8]">Together</span>
+              Code<span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 via-cyan-300 to-emerald-300">Together</span>
             </span>
             <span className="text-[10px] text-slate-400 font-medium -mt-1 hidden sm:inline">
               Live Coding Workspace
@@ -140,7 +140,7 @@ export default function LandingNavbar({
               <button
                 id="btn-signup-trigger"
                 onClick={() => onOpenAuth?.('register')}
-                className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-xs font-medium text-white shadow-[0_0_15px_rgba(37,99,235,0.4)] transition-all cursor-pointer"
+                className="px-4 py-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-xs font-medium text-white shadow-[0_0_15px_rgba(99,102,241,0.35)] transition-all cursor-pointer"
               >
                 Sign Up
               </button>
@@ -149,7 +149,7 @@ export default function LandingNavbar({
 
           <button
             onClick={onNavigateToWorkspace}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-gradient-to-r from-blue-600 to-sky-500 hover:from-blue-500 hover:to-sky-400 text-white font-medium text-xs shadow-[0_0_20px_rgba(37,99,235,0.4)] transition-all cursor-pointer active:scale-95"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl btn-combined text-white font-medium text-xs transition-all cursor-pointer active:scale-95"
           >
             <span>Launch Workspace</span>
             <ArrowRight className="w-3.5 h-3.5" />
