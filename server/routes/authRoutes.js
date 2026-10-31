@@ -47,12 +47,9 @@ export async function validateGoogleCredential(credential) {
     throw err;
   }
 
-  const clientId = process.env.GOOGLE_CLIENT_ID;
-  if (!clientId) {
-    const err = new Error('Google authentication is not configured on this server');
-    err.status = 500;
-    throw err;
-  }
+  const clientId =
+    process.env.GOOGLE_CLIENT_ID ||
+    '764795198689-41h522pnno7r3ifmb6im3iu12418m31f.apps.googleusercontent.com';
 
   let payload;
   try {
