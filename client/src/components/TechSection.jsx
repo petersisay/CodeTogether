@@ -65,12 +65,12 @@ export default function TechSection() {
     <section id="technology" className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24 text-left border-t border-blue-900/30">
       {/* Section Header */}
       <div className="text-center max-w-3xl mx-auto mb-14 sm:mb-16">
-        <span className="text-xs font-bold text-sky-400 tracking-wider uppercase bg-blue-950/70 border border-blue-800/40 px-3.5 py-1.5 rounded-full inline-block mb-3">
+        <span className="text-xs font-bold text-sky-300 tracking-wider uppercase bg-gradient-to-r from-blue-950/80 via-indigo-950/80 to-cyan-950/80 border border-blue-700/50 px-3.5 py-1.5 rounded-full inline-block mb-3 shadow-[0_0_15px_rgba(56,189,248,0.2)]">
           Architecture
         </span>
         <h2 className="text-3xl sm:text-5xl font-extrabold text-white tracking-tight">
           Modern & Reliable{' '}
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300">
+          <span className="gradient-text-combined">
             Technology Stack
           </span>
         </h2>
@@ -86,14 +86,14 @@ export default function TechSection() {
           return (
             <div
               key={idx}
-              className="p-5 rounded-2xl bg-[#091122] border border-blue-900/40 hover:border-blue-500/50 shadow-md hover:shadow-[0_0_25px_rgba(37,99,235,0.2)] transition-all group flex flex-col justify-between"
+              className="p-5 rounded-2xl bg-[#091122] border border-blue-900/40 hover:border-indigo-500/50 hover:shadow-[0_0_25px_rgba(99,102,241,0.2)] transition-all group flex flex-col justify-between hover:-translate-y-1"
             >
               <div>
                 <div className="flex items-center justify-between mb-4">
-                  <div className="w-10 h-10 rounded-xl bg-blue-950/60 border border-blue-700/40 flex items-center justify-center text-sky-400 group-hover:scale-105 group-hover:text-cyan-300 transition-transform">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-950/80 to-indigo-950/80 border border-blue-700/50 flex items-center justify-center text-sky-300 group-hover:scale-110 group-hover:text-cyan-300 transition-all shadow-sm">
                     <Icon className="w-5 h-5" />
                   </div>
-                  <span className="text-[10px] font-semibold text-sky-300 px-2 py-0.5 rounded-full bg-blue-950/70 border border-blue-800/50">
+                  <span className="text-[10px] font-semibold text-sky-200 px-2 py-0.5 rounded-full bg-gradient-to-r from-blue-950/80 to-indigo-950/80 border border-blue-800/60 shadow-sm">
                     {tech.highlight}
                   </span>
                 </div>
