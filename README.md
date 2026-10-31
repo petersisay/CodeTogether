@@ -1,7 +1,7 @@
 # 🚀 CodeTogether — Live Collaborative Coding, Voice, Video & Project Export Workspace
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/petersisay/CodeTogether/main/client/public/favicon.svg" alt="CodeTogether Logo" width="80" height="80" />
+  <img src="https://raw.githubusercontent.com/petersisay/CodeTogether/main/client/public/assets/logo.png" alt="CodeTogether Logo" width="130" />
 </p>
 
 <h3 align="center">Code • Collaborate • Export • Build Together</h3>
