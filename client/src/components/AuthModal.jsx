@@ -22,7 +22,8 @@ export default function AuthModal({
 
   const googleBtnRef = useRef(null);
 
-  const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
+  const defaultBackend = import.meta.env.DEV ? 'http://localhost:5000' : 'https://codetogether-v1fo.onrender.com';
+  const backendUrl = import.meta.env.VITE_BACKEND_URL || defaultBackend;
   const googleClientId =
     import.meta.env.VITE_GOOGLE_CLIENT_ID ||
     '764795198689-41h522pnno7r3ifmb6im3iu12418m31f.apps.googleusercontent.com';
@@ -81,7 +82,11 @@ export default function AuthModal({
       setSignupPassword('');
     } catch (err) {
       console.error('[Google Auth Error]:', err);
-      setError(err.message || 'Google authentication failed');
+      if (err.name === 'TypeError' && err.message?.toLowerCase().includes('fetch')) {
+        setError('Unable to reach the backend server. The cloud server may be waking up—please wait a few seconds and try again.');
+      } else {
+        setError(err.message || 'Google authentication failed');
+      }
     } finally {
       setGoogleLoading(false);
     }
@@ -137,7 +142,12 @@ export default function AuthModal({
       onAuthSuccess?.(data.user, data.token);
       onClose?.();
     } catch (err) {
-      setError(err.message || 'Registration failed');
+      console.error('[Google Registration Error]:', err);
+      if (err.name === 'TypeError' && err.message?.toLowerCase().includes('fetch')) {
+        setError('Unable to connect to the server. Please check your connection and try again.');
+      } else {
+        setError(err.message || 'Registration failed');
+      }
     } finally {
       setLoading(false);
     }
@@ -221,7 +231,12 @@ export default function AuthModal({
       onAuthSuccess?.(data.user, data.token);
       onClose?.();
     } catch (err) {
-      setError(err.message || 'Authentication failed');
+      console.error('[Login Error]:', err);
+      if (err.name === 'TypeError' && err.message?.toLowerCase().includes('fetch')) {
+        setError('Unable to reach the backend server. The cloud service may be waking up—please wait a few seconds and try again.');
+      } else {
+        setError(err.message || 'Authentication failed');
+      }
     } finally {
       setLoading(false);
     }
