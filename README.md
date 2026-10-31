@@ -14,7 +14,7 @@
   <a href="https://code-together-weld.vercel.app/"><img src="https://img.shields.io/badge/Frontend-Vercel%20Live-black?style=for-the-badge&logo=vercel" alt="Vercel Deployment" /></a>
   <a href="https://codetogether-v1fo.onrender.com/api/health"><img src="https://img.shields.io/badge/Backend-Render%20Live-46E3B7?style=for-the-badge&logo=render&logoColor=black" alt="Render Backend" /></a>
   <a href="https://www.mongodb.com/atlas"><img src="https://img.shields.io/badge/Database-MongoDB%20Atlas-47A248?style=for-the-badge&logo=mongodb&logoColor=white" alt="MongoDB Atlas" /></a>
-  <img src="https://img.shields.io/badge/Tests-33%20Passing-brightgreen?style=for-the-badge&logo=node.js" alt="33 Tests Passing" />
+  <img src="https://img.shields.io/badge/Tests-36%20Passing-brightgreen?style=for-the-badge&logo=node.js" alt="36 Tests Passing" />
   <img src="https://img.shields.io/badge/License-MIT-blue?style=for-the-badge" alt="License MIT" />
 </p>
 
