@@ -26,14 +26,14 @@ export default function AboutSection() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
         {/* Left Column: Mission & Narrative */}
         <div className="lg:col-span-7 space-y-6">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-950/70 border border-blue-800/40 text-xs font-bold text-sky-400 uppercase tracking-wider">
-            <GraduationCap className="w-3.5 h-3.5" />
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gradient-to-r from-blue-950/80 via-indigo-950/80 to-purple-950/80 border border-indigo-700/50 text-xs font-bold text-sky-300 uppercase tracking-wider shadow-[0_0_20px_rgba(99,102,241,0.25)]">
+            <GraduationCap className="w-3.5 h-3.5 text-cyan-400" />
             <span>Our Mission & Story</span>
           </div>
 
           <h2 className="text-3xl sm:text-5xl font-extrabold text-white tracking-tight leading-tight">
             Built for Developers Who{' '}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300">
+            <span className="gradient-text-combined">
               Create Together
             </span>
           </h2>
@@ -45,8 +45,8 @@ export default function AboutSection() {
           {/* 4 Feature Checklist Items */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
             {points.map((point, index) => (
-              <div key={index} className="p-4 rounded-xl bg-[#091122] border border-blue-900/40 space-y-1.5">
-                <div className="flex items-center gap-2 text-sky-400 font-semibold text-xs sm:text-sm">
+              <div key={index} className="p-4 rounded-xl bg-gradient-to-b from-[#0B152C] to-[#070E1E] border border-indigo-900/40 hover:border-indigo-500/50 transition-all space-y-1.5 shadow-sm">
+                <div className="flex items-center gap-2 text-sky-300 font-semibold text-xs sm:text-sm">
                   <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-400" />
                   <span>{point.title}</span>
                 </div>
@@ -61,24 +61,24 @@ export default function AboutSection() {
         {/* Right Column: Visual Team Illustration & Glassmorphic Highlights */}
         <div className="lg:col-span-5 flex flex-col items-center justify-center">
           <div className="relative w-full max-w-md mx-auto">
-            {/* Glowing Backdrop */}
-            <div className="absolute -inset-2 bg-gradient-to-r from-blue-600/30 to-sky-500/20 rounded-3xl blur-2xl opacity-70"></div>
+            {/* Glowing Multi-Color Combined Backdrop */}
+            <div className="absolute -inset-3 bg-gradient-to-r from-blue-600/40 via-indigo-600/35 to-purple-500/30 rounded-3xl blur-2xl opacity-80"></div>
 
             {/* Illustration Frame */}
-            <div className="relative rounded-2xl overflow-hidden border border-blue-600/40 bg-[#0A1226]/80 p-2 shadow-2xl">
+            <div className="relative rounded-2xl overflow-hidden border border-indigo-500/40 bg-gradient-to-b from-[#0C1530]/90 to-[#070D1B]/95 p-2 shadow-[0_0_50px_rgba(99,102,241,0.25)]">
               <img
                 src="/assets/team-illustration.png"
                 alt="CodeTogether collaborative development team"
-                className="w-full h-auto object-cover rounded-xl"
+                className="w-full h-auto object-cover rounded-xl shadow-inner"
               />
 
               {/* Floating Pill Badges */}
-              <div className="absolute top-5 right-5 px-3 py-1.5 rounded-xl bg-[#070D1B]/90 border border-blue-500/40 backdrop-blur-md text-[11px] font-bold text-sky-300 shadow-xl flex items-center gap-1.5">
+              <div className="absolute top-5 right-5 px-3 py-1.5 rounded-xl bg-[#070D1B]/95 border border-cyan-500/40 backdrop-blur-md text-[11px] font-bold text-cyan-300 shadow-xl flex items-center gap-1.5">
                 <Code2 className="w-3.5 h-3.5 text-cyan-400" />
                 <span>Concurrent Pair Coding</span>
               </div>
 
-              <div className="absolute bottom-5 left-5 px-3 py-1.5 rounded-xl bg-[#070D1B]/90 border border-blue-500/40 backdrop-blur-md text-[11px] font-bold text-emerald-300 shadow-xl flex items-center gap-1.5">
+              <div className="absolute bottom-5 left-5 px-3 py-1.5 rounded-xl bg-[#070D1B]/95 border border-purple-500/40 backdrop-blur-md text-[11px] font-bold text-purple-300 shadow-xl flex items-center gap-1.5">
                 <Globe2 className="w-3.5 h-3.5 text-emerald-400" />
                 <span>WebRTC P2P Voice & Video</span>
               </div>
