@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { io } from 'socket.io-client';
 import LandingNavbar from './components/LandingNavbar.jsx';
 import HeroSection from './components/HeroSection.jsx';
-import WorkspacePreview from './components/WorkspacePreview.jsx';
 import FeaturesSection from './components/FeaturesSection.jsx';
 import AboutSection from './components/AboutSection.jsx';
 import HowItWorksSection from './components/HowItWorksSection.jsx';
@@ -232,12 +231,7 @@ export default function App() {
             currentUser={currentUser}
           />
 
-          {/* C. Large Workspace Preview Section */}
-          <div id="coding-workspace">
-            <WorkspacePreview onLaunchWorkspace={handleNavigateToWorkspace} />
-          </div>
-
-          {/* D. Features Section */}
+          {/* C. Features Section */}
           <FeaturesSection />
 
           {/* E. About CodeTogether Section */}
