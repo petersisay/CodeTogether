@@ -34,9 +34,10 @@ export default function HeroSection({ onStartCoding, onExploreFeatures, currentU
         <div className="absolute inset-0 bg-gradient-to-b from-[#070B14]/90 via-transparent to-[#070B14]" />
         <div className="absolute inset-0 bg-gradient-to-r from-[#070B14]/50 via-transparent to-[#070B14]/50" />
 
-        {/* Soft glowing blue & cyan illumination pulses */}
+        {/* Soft glowing blue, cyan & indigo illumination pulses */}
         <div className="absolute top-1/4 left-6 sm:left-16 w-64 sm:w-80 h-64 sm:h-80 rounded-full bg-blue-500/20 blur-[100px] hero-pulse-glow" />
         <div className="absolute top-1/3 right-6 sm:right-16 w-72 sm:w-96 h-72 sm:h-96 rounded-full bg-cyan-400/20 blur-[110px] hero-pulse-glow-alt" />
+        <div className="absolute top-1/2 left-1/3 w-72 sm:w-80 h-72 sm:h-80 rounded-full bg-purple-600/15 blur-[120px] pointer-events-none" />
 
         {/* Luminous flowing particles */}
         <div className="hero-particle hero-particle-1" />
@@ -50,9 +51,9 @@ export default function HeroSection({ onStartCoding, onExploreFeatures, currentU
          ========================================================================= */}
       <div className="relative z-10 flex flex-col items-center text-center max-w-5xl mx-auto">
         {/* Decorative Pill Badge */}
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#08122B]/85 backdrop-blur-md border border-blue-500/40 shadow-[0_0_25px_rgba(37,99,235,0.3)] mb-6 animate-in fade-in duration-300">
-          <Sparkles className="w-3.5 h-3.5 text-sky-400 animate-pulse" />
-          <span className="text-xs font-semibold text-sky-300 tracking-wide">
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gradient-to-r from-blue-950/90 via-[#0B1536]/90 to-indigo-950/90 backdrop-blur-md border border-indigo-500/40 shadow-[0_0_25px_rgba(99,102,241,0.3)] mb-6 animate-in fade-in duration-300">
+          <Sparkles className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
+          <span className="text-xs font-semibold text-transparent bg-clip-text bg-gradient-to-r from-sky-300 via-indigo-200 to-cyan-200 tracking-wide">
             Real-Time Collaborative Coding for Developers & Teams
           </span>
         </div>
@@ -60,7 +61,7 @@ export default function HeroSection({ onStartCoding, onExploreFeatures, currentU
         {/* Main Headline */}
         <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-white leading-[1.1] max-w-4xl drop-shadow-[0_4px_16px_rgba(0,0,0,0.8)]">
           Code Together.{' '}
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-cyan-300">
+          <span className="gradient-text-combined">
             Build Something Amazing.
           </span>
         </h1>
@@ -74,7 +75,7 @@ export default function HeroSection({ onStartCoding, onExploreFeatures, currentU
         <div className="mt-8 sm:mt-10 flex flex-wrap items-center justify-center gap-4">
           <button
             onClick={onStartCoding}
-            className="px-8 py-3.5 rounded-xl bg-gradient-to-r from-blue-600 to-sky-500 hover:from-blue-500 hover:to-sky-400 text-white font-semibold text-sm sm:text-base shadow-[0_0_30px_rgba(37,99,235,0.45)] hover:shadow-[0_0_40px_rgba(56,189,248,0.6)] transition-all cursor-pointer flex items-center gap-2.5 active:scale-95 group"
+            className="px-8 py-3.5 rounded-xl btn-combined text-white font-semibold text-sm sm:text-base transition-all cursor-pointer flex items-center gap-2.5 active:scale-95 group"
           >
             <span>{currentUser ? `Enter Workspace as ${currentUser.username}` : 'Start Coding Together'}</span>
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
