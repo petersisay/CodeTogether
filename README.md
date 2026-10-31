@@ -199,7 +199,6 @@ CodeTogether/
 │   │   ├── components/
 │   │   │   ├── LandingNavbar.jsx       # Sticky navigation bar with profile actions
 │   │   │   ├── HeroSection.jsx         # Animated hero with WebP background & pulses
-│   │   │   ├── WorkspacePreview.jsx    # Interactive IDE showcase preview
 │   │   │   ├── FeaturesSection.jsx     # 6-card platform capabilities
 │   │   │   ├── AboutSection.jsx        # ASTU team narrative & illustration
 │   │   │   ├── HowItWorksSection.jsx   # 3-step numbered workflow
