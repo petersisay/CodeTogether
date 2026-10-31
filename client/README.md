@@ -46,7 +46,6 @@ client/src/
 └── components/
     ├── LandingNavbar.jsx          # Sticky navigation bar with auth triggers & brand logo
     ├── HeroSection.jsx            # Animated hero with WebP background, glow pulses & particles
-    ├── WorkspacePreview.jsx       # Interactive mock IDE showcase on landing page
     ├── FeaturesSection.jsx        # 6-card platform capabilities grid
     ├── AboutSection.jsx           # ASTU university developer team narrative & illustration
     ├── HowItWorksSection.jsx      # 3-step numbered workflow guide
