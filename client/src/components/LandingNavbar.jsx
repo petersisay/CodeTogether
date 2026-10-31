@@ -43,10 +43,12 @@ export default function LandingNavbar({
           href="/"
           className="flex items-center gap-2.5 group cursor-pointer"
         >
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-600 via-indigo-600 to-cyan-400 p-[1px] shadow-[0_0_20px_rgba(99,102,241,0.4)] transition-transform group-hover:scale-105">
-            <div className="w-full h-full rounded-[11px] bg-[#0A1226] flex items-center justify-center">
-              <span className="font-code font-bold text-sm text-cyan-300">&lt;/&gt;</span>
-            </div>
+          <div className="w-10 h-10 rounded-xl overflow-hidden bg-[#0A1226] border border-blue-500/40 p-0.5 shadow-[0_0_20px_rgba(56,189,248,0.35)] transition-transform group-hover:scale-105 flex items-center justify-center">
+            <img
+              src="/assets/logo.png"
+              alt="CodeTogether Logo"
+              className="w-full h-full object-contain rounded-[9px]"
+            />
           </div>
           <div className="flex flex-col text-left">
             <span className="font-bold text-base tracking-tight text-white flex items-center">
