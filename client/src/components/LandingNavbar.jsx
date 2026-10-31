@@ -27,6 +27,14 @@ export default function LandingNavbar({
     }
   };
 
+  const handleWorkspaceAction = () => {
+    if (currentUser) {
+      onNavigateToWorkspace();
+    } else {
+      onOpenAuth?.('login');
+    }
+  };
+
   return (
     <header className="sticky top-0 z-50 w-full bg-[#070B14]/85 backdrop-blur-xl border-b border-blue-900/30 transition-all">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
@@ -63,7 +71,7 @@ export default function LandingNavbar({
             </a>
           ))}
           <button
-            onClick={onNavigateToWorkspace}
+            onClick={handleWorkspaceAction}
             className="text-xs font-semibold text-sky-400 hover:text-sky-300 flex items-center gap-1 transition-colors cursor-pointer"
           >
             <span>Workspace</span>
@@ -148,7 +156,7 @@ export default function LandingNavbar({
           )}
 
           <button
-            onClick={onNavigateToWorkspace}
+            onClick={handleWorkspaceAction}
             className="flex items-center gap-1.5 px-4 py-2 rounded-xl btn-combined text-white font-medium text-xs transition-all cursor-pointer active:scale-95"
           >
             <span>Launch Workspace</span>
@@ -159,7 +167,7 @@ export default function LandingNavbar({
         {/* Mobile Menu Button */}
         <div className="flex md:hidden items-center gap-2">
           <button
-            onClick={onNavigateToWorkspace}
+            onClick={handleWorkspaceAction}
             className="px-3 py-1.5 rounded-lg bg-blue-600 text-white font-medium text-xs shadow-sm cursor-pointer"
           >
             Workspace
@@ -229,7 +237,7 @@ export default function LandingNavbar({
             <button
               onClick={() => {
                 setMobileMenuOpen(false);
-                onNavigateToWorkspace();
+                handleWorkspaceAction();
               }}
               className="w-full py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-sky-500 text-white font-medium text-xs text-center shadow-lg"
             >
