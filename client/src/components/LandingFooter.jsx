@@ -16,10 +16,8 @@ export default function LandingFooter({ onNavigateToWorkspace }) {
           {/* Brand & Narrative (Col 1-5) */}
           <div className="md:col-span-5 space-y-3.5">
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-sky-500 p-[1px]">
-                <div className="w-full h-full rounded-[7px] bg-[#0A1226] flex items-center justify-center">
-                  <span className="font-code font-bold text-xs text-sky-400">&lt;/&gt;</span>
-                </div>
+              <div className="w-8 h-8 rounded-lg overflow-hidden bg-[#0A1226] border border-blue-500/40 p-0.5 shadow-sm flex items-center justify-center">
+                <img src="/assets/logo.png" alt="CodeTogether Logo" className="w-full h-full object-contain rounded-md" />
               </div>
               <span className="font-bold text-base tracking-tight text-white flex items-center">
                 Code<span className="text-[#38BDF8]">Together</span>
