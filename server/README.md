@@ -1,7 +1,7 @@
 # ⚙️ CodeTogether Backend — Server Architecture & API Guide
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/petersisay/CodeTogether/main/client/public/favicon.svg" alt="CodeTogether Logo" width="64" height="64" />
+  <img src="https://raw.githubusercontent.com/petersisay/CodeTogether/main/client/public/assets/logo.png" alt="CodeTogether Logo" width="110" />
 </p>
 
 <h3 align="center">Node.js, Express, Socket.IO & MongoDB Atlas Backend Engine</h3>
