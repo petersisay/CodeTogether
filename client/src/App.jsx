@@ -48,7 +48,8 @@ export default function App() {
 
   // 3. Initialize Socket.IO connection with JWT token
   useEffect(() => {
-    const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
+    const defaultBackend = import.meta.env.DEV ? 'http://localhost:5000' : 'https://codetogether-v1fo.onrender.com';
+    const backendUrl = import.meta.env.VITE_BACKEND_URL || defaultBackend;
     const token = localStorage.getItem('codetogether_token');
 
     const socketInstance = io(backendUrl, {
