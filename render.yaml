@@ -11,9 +11,11 @@ services:
         value: production
       - key: PORT
         value: 5000
-      - key: MONGODB_URI
-        sync: false
       - key: CLIENT_URL
+        value: https://code-together-weld.vercel.app
+      - key: GOOGLE_CLIENT_ID
+        value: 764795198689-41h522pnno7r3ifmb6im3iu12418m31f.apps.googleusercontent.com
+      - key: MONGODB_URI
         sync: false
       - key: JWT_SECRET
         sync: false
