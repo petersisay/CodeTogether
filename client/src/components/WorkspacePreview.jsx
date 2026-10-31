@@ -204,7 +204,7 @@ export default function CollaborativeEditor() {
 
           <button
             onClick={onLaunchWorkspace}
-            className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-sky-500 hover:from-blue-500 hover:to-sky-400 text-white font-semibold text-xs sm:text-sm shadow-[0_0_20px_rgba(37,99,235,0.4)] transition-all cursor-pointer flex items-center gap-2 group active:scale-95"
+            className="px-6 py-2.5 rounded-xl btn-combined text-white font-semibold text-xs sm:text-sm transition-all cursor-pointer flex items-center gap-2 group active:scale-95"
           >
             <span>Launch Full Workspace</span>
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
