@@ -255,8 +255,8 @@ export default function AuthModal({
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-blue-900/40 bg-[#0A142A]">
           <div className="flex items-center gap-2.5">
-            <div className="w-7 h-7 rounded-lg bg-blue-900/50 border border-blue-500/40 flex items-center justify-center text-sky-400 font-code font-bold text-xs">
-              &lt;/&gt;
+            <div className="w-8 h-8 rounded-lg overflow-hidden bg-[#0A1226] border border-blue-500/40 p-0.5 shadow-sm flex items-center justify-center">
+              <img src="/assets/logo.png" alt="CodeTogether Logo" className="w-full h-full object-contain rounded-md" />
             </div>
             <h3 className="text-base font-bold text-white">
               {pendingGoogleAuth
