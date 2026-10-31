@@ -98,6 +98,10 @@ export default function App() {
   };
 
   const handleNavigateToWorkspace = () => {
+    if (!currentUser) {
+      handleOpenAuth('login');
+      return;
+    }
     window.history.pushState({}, '', '/workspace');
     setCurrentPath('/workspace');
     window.scrollTo({ top: 0, behavior: 'instant' });
@@ -180,6 +184,18 @@ export default function App() {
 
   // Route 2: Dedicated Full-Screen Collaborative Coding Workspace (/workspace)
   if (currentPath.startsWith('/workspace')) {
+    if (!currentUser) {
+      return (
+        <div className="min-h-screen bg-[#070B14] flex flex-col items-center justify-center p-4">
+          <AuthModal
+            isOpen={true}
+            initialMode="login"
+            onClose={handleReturnToHome}
+            onAuthSuccess={handleAuthSuccess}
+          />
+        </div>
+      );
+    }
     return (
       <div className="h-screen h-dvh w-full bg-[#070B14] overflow-hidden">
         <WorkspaceWindow
