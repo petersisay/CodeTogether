@@ -87,7 +87,8 @@ export default function WorkspaceWindow({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
+  const defaultBackend = import.meta.env.DEV ? 'http://localhost:5000' : 'https://codetogether-v1fo.onrender.com';
+  const backendUrl = import.meta.env.VITE_BACKEND_URL || defaultBackend;
 
   const getAuthHeaders = () => {
     const token = localStorage.getItem('codetogether_token');
