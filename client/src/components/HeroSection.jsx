@@ -50,12 +50,19 @@ export default function HeroSection({ onStartCoding, onExploreFeatures, currentU
           HERO CONTENT LAYER (Interactive & Readability Maximized)
          ========================================================================= */}
       <div className="relative z-10 flex flex-col items-center text-center max-w-5xl mx-auto">
-        {/* Decorative Pill Badge */}
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gradient-to-r from-blue-950/90 via-[#0B1536]/90 to-indigo-950/90 backdrop-blur-md border border-indigo-500/40 shadow-[0_0_25px_rgba(99,102,241,0.3)] mb-6 animate-in fade-in duration-300">
-          <Sparkles className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
-          <span className="text-xs font-semibold text-transparent bg-clip-text bg-gradient-to-r from-sky-300 via-indigo-200 to-cyan-200 tracking-wide">
-            Real-Time Collaborative Coding for Developers & Teams
+        {/* Decorative Pill Badge: 3C Motto */}
+        <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-gradient-to-r from-blue-950/90 via-[#0B1536]/90 to-indigo-950/90 backdrop-blur-md border border-cyan-500/40 shadow-[0_0_25px_rgba(56,189,248,0.25)] mb-6 animate-in fade-in duration-300 group hover:border-cyan-400/60 transition-all">
+          <span className="px-2 py-0.5 rounded-md bg-gradient-to-r from-sky-500 via-blue-600 to-indigo-600 text-white font-extrabold text-[10px] tracking-wider shadow-sm uppercase">
+            3C
           </span>
+          <div className="flex items-center gap-1.5 text-xs font-semibold tracking-wide">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-300 to-cyan-200">Code</span>
+            <span className="text-indigo-400/60 text-[10px]">•</span>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-200 to-indigo-200">Collaborate</span>
+            <span className="text-indigo-400/60 text-[10px]">•</span>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-200 to-emerald-300">Connect</span>
+          </div>
+          <Sparkles className="w-3.5 h-3.5 text-cyan-400 animate-pulse ml-0.5" />
         </div>
 
         {/* Main Headline */}
