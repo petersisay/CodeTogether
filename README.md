@@ -4,10 +4,10 @@
   <img src="https://raw.githubusercontent.com/petersisay/CodeTogether/main/client/public/assets/logo.png" alt="CodeTogether Logo" width="130" />
 </p>
 
-<h3 align="center">Code • Collaborate • Export • Build Together</h3>
+<h3 align="center">3C: Code • Collaborate • Connect</h3>
 
 <p align="center">
-  A production-ready, full-stack collaborative programming workspace where developers write code simultaneously, communicate through text, voice, and video, export projects to local IDEs, and build real-world software seamlessly in real time.
+  A real-time collaborative coding workspace designed for students, software engineering teams, and pair programmers. Write code simultaneously, communicate through text, voice, and video, export projects to local IDEs, and build software seamlessly in real time.
 </p>
 
 <p align="center">
@@ -72,6 +72,8 @@ Camera-independent audio calls and peer-to-peer mesh video meetings with speakin
 | :--- | :--- |
 | ⚡ **Real-Time Code Collaboration** | Concurrent multi-user code synchronization powered by Socket.IO with file version tracking and collision notifications. |
 | 📦 **Local Project ZIP Export** | Download any project room as a clean, structured `.zip` archive preserving exact relative paths, nested folders, and code contents for offline editing. |
+| 📱 **Responsive Navigation Overhaul** | Fluid, non-collapsing responsive navbar featuring spacious desktop links (`lg:`) and a glassmorphic slide-down drawer menu on tablet (`768px`) and mobile. |
+| 🚪 **Protected Workspace Access Gate** | Direct workspace launch links route unauthenticated users to the Google Sign-In & Registration modal, safeguarding active developer rooms. |
 | 🎨 **Animated Developer Hero Background** | High-performance CSS-animated background with slow drift, gentle glowing pulses, flowing particle effects, and `prefers-reduced-motion` compliance. |
 | 🔒 **Google-Only Verified Sign-Up** | Registration is strictly gated to verified Google accounts with cryptographic signature verification, preventing spam and fake accounts. |
 | 🏷️ **Post-Verification Onboarding** | After Google account verification, users choose their unique workspace username and optional password for subsequent direct sign-ins. |
@@ -81,6 +83,7 @@ Camera-independent audio calls and peer-to-peer mesh video meetings with speakin
 | 💬 **Deduplicated Team Chat** | Instant messaging with single-dispatch WebSocket persistence to MongoDB Atlas, preventing duplicate records. |
 | 👥 **Honest Presence Tracking** | Real-time collaborator avatars showing genuine connected users and their current file activity. Zero demo users or mock numbers. |
 | 🛡️ **Workspace Data Retention** | Chat messages and editor drafts remain preserved on screen across sign-outs in view-only guest mode. |
+| 🧹 **Streamlined Minimal Footer** | Distraction-free navigation footer with live workspace status indicator and essential section anchors. |
 
 ---
 
@@ -189,6 +192,7 @@ CodeTogether/
 ├── client/
 │   ├── public/
 │   │   ├── assets/
+│   │   │   ├── logo.png                # Official CodeTogether brand logo
 │   │   │   ├── hero-bg.webp            # High-performance animated hero background
 │   │   │   ├── hero-bg.png             # Fallback original hero background
 │   │   │   ├── team-illustration.png   # About section team graphic
@@ -197,14 +201,14 @@ CodeTogether/
 │   │   └── icons.svg
 │   ├── src/
 │   │   ├── components/
-│   │   │   ├── LandingNavbar.jsx       # Sticky navigation bar with profile actions
-│   │   │   ├── HeroSection.jsx         # Animated hero with WebP background & pulses
+│   │   │   ├── LandingNavbar.jsx       # Responsive navbar with desktop (lg:) & tablet drawer
+│   │   │   ├── HeroSection.jsx         # Animated hero with '3C Code • Collaborate • Connect'
 │   │   │   ├── FeaturesSection.jsx     # 6-card platform capabilities
-│   │   │   ├── AboutSection.jsx        # ASTU team narrative & illustration
+│   │   │   ├── AboutSection.jsx        # Developer team narrative & illustration
 │   │   │   ├── HowItWorksSection.jsx   # 3-step numbered workflow
 │   │   │   ├── TechSection.jsx         # Production technology stack badges
 │   │   │   ├── CtaSection.jsx          # High-converting closing CTA banner
-│   │   │   ├── LandingFooter.jsx       # Platform footer & GitHub repository link
+│   │   │   ├── LandingFooter.jsx       # Streamlined platform footer with section anchors
 │   │   │   ├── WorkspaceWindow.jsx     # Full-screen IDE layout, sidebars & ZIP export
 │   │   │   ├── MeetingRoom.jsx         # Native WebRTC voice & video room
 │   │   │   ├── AuthModal.jsx           # Google-only verified sign-up & sign-in modal
@@ -229,13 +233,18 @@ CodeTogether/
 │   │   └── roomRoutes.js               # Room CRUD, file auto-save, and /export endpoint
 │   ├── socket.js                       # Socket.IO real-time sync & WebRTC signaling
 │   ├── tests/
-│   │   ├── auth.test.js                # Google verification & token tests
-│   │   ├── rooms_api.test.js           # Room authorization & export tests
-│   │   └── socket_and_webrtc.test.js   # Real-time synchronization & signaling tests
+│   │   ├── auth.test.js                # Google verification & token tests (13 tests)
+│   │   ├── rooms_api.test.js           # Room authorization & export tests (12 tests)
+│   │   ├── cors.test.js                # CORS policy & origin validation tests (2 tests)
+│   │   ├── socket_and_webrtc.test.js   # Real-time synchronization & signaling tests (4 tests)
+│   │   └── google_auth_suite           # OAuth verification & policy enforcement (5 tests)
 │   ├── index.js                        # Server entrypoint
 │   └── package.json
 ├── docs/
-│   └── images/                         # Showcase screenshots for documentation
+│   ├── images/                         # Showcase screenshots for documentation
+│   ├── ARCHITECTURE.md                 # System topology & operational concurrency
+│   ├── API_REFERENCE.md                # Comprehensive REST & WebSocket specifications
+│   └── FINAL_PROJECT_REPORT.md         # Production audit and completion report
 └── README.md
 ```
 
@@ -249,18 +258,18 @@ CodeTogether/
 4. **Sender Identity Derivation**: Message sender and avatar are strictly derived from verified server session tokens, eliminating identity impersonation.
 5. **Path Traversal Sanitization**: Project export automatically sanitizes all file paths, stripping null bytes, Windows drive roots, and `..` traversal sequences.
 6. **Private Room Authorization**: Stored rooms with private visibility or restricted collaborator lists enforce strict creator/whitelist validation across file mutations, WebSocket room subscriptions, and project ZIP exports.
-7. **Strict CORS Policy**: Whitelists authorized origins (`localhost:5173` and `https://code-together-weld.vercel.app`).
+7. **Strict CORS Policy**: Whitelists authorized origins (`localhost:5173` and `https://code-together-weld.vercel.app`) and safely validates preflight OPTIONS headers.
 8. **No Duplicate Chat Messages**: Single-dispatch WebSocket persistence eliminates duplicate entries from simultaneous REST/Socket writes.
 9. **Zero Demo Artifacts**: Eliminated all mock chat history, fake collaborator arrays, simulated online counts, and hardcoded demo identities.
 
 ---
 
-## 🧪 Automated Test Suite (33 Tests Passing)
+## 🧪 Automated Test Suite (36 Tests Passing)
 
-CodeTogether features 33 comprehensive unit and integration tests covering Google verification, authorization gates, real-time synchronization, WebRTC signaling, and project export.
+CodeTogether features 36 comprehensive unit and integration tests covering Google verification, CORS policy enforcement, authorization gates, real-time synchronization, WebRTC signaling, and project export.
 
 ```bash
-# Run backend test suite
+# Run backend test suite (36 tests)
 npm test --prefix server
 
 # Run client production build verification
@@ -272,6 +281,7 @@ npm run build --prefix client
 - ✔️ Token expiration, untrusted issuer, and unverified email rejection (401 / 403)
 - ✔️ Account takeover prevention (protects existing local accounts)
 - ✔️ JWT session generation and cryptographic verification
+- ✔️ CORS policy origin validation and preflight handling (`isOriginAllowed`)
 - ✔️ Unauthenticated access rejection for mutating room and file routes (401)
 - ✔️ Unauthenticated access rejection for project export route (401)
 - ✔️ Authenticated project export endpoint sanitizing paths and returning stored files (200)
@@ -355,7 +365,7 @@ Open `http://localhost:5173` in your browser.
 | **JWT Token Generation** | **0.087 ms** per token (~11,400 ops/sec) | ⚡ High-throughput session auth |
 | **Vite Client Production Build** | **1.35 s** build time | ⚡ Rapid CI/CD deployment |
 | **Hero Background Asset (WebP)** | **61.8 kB** (95% quality) | ⚡ Ultra-fast LCP paint |
-| **Automated Test Suite** | **33 / 33 tests passing** | ⚡ 100% test coverage |
+| **Automated Test Suite** | **36 / 36 tests passing** | ⚡ 100% test coverage |
 
 Run the benchmark suite anytime with:
 ```bash
