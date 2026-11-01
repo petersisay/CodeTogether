@@ -4,7 +4,7 @@ import { ArrowRight, Sparkles } from 'lucide-react';
 export default function CtaSection({ onStartCoding, currentUser }) {
   return (
     <section className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24 text-center">
-      <div className="relative rounded-3xl bg-gradient-to-b from-[#0B1530] via-[#0A1226] to-[#070D1B] border border-blue-500/40 p-8 sm:p-14 lg:p-16 shadow-[0_0_80px_rgba(37,99,235,0.25)] overflow-hidden">
+      <div className="relative rounded-3xl bg-gradient-to-b from-[#0E1F4D] via-[#0C193E] to-[#0B1739] border border-blue-500/40 p-8 sm:p-14 lg:p-16 shadow-[0_0_80px_rgba(37,99,235,0.3)] overflow-hidden">
         {/* Multi-tone Ambient Glowing Blobs */}
         <div className="absolute top-0 left-1/4 w-80 h-80 bg-blue-500/15 rounded-full blur-3xl pointer-events-none"></div>
         <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-indigo-500/15 rounded-full blur-3xl pointer-events-none"></div>
