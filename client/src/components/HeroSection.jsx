@@ -30,14 +30,14 @@ export default function HeroSection({ onStartCoding, onExploreFeatures, currentU
         </picture>
 
         {/* Center-aligned subtle dark overlay: preserves headline readability while keeping edge illustrations luminous */}
-        <div className="absolute inset-0 bg-radial-[at_center_center] from-[#070B14]/75 via-[#070B14]/55 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#070B14]/90 via-transparent to-[#070B14]" />
-        <div className="absolute inset-0 bg-gradient-to-r from-[#070B14]/50 via-transparent to-[#070B14]/50" />
+        <div className="absolute inset-0 bg-radial-[at_center_center] from-[#0B1739]/70 via-[#0B1739]/50 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0B1739]/85 via-transparent to-[#0B1739]" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#0B1739]/45 via-transparent to-[#0B1739]/45" />
 
         {/* Soft glowing blue, cyan & indigo illumination pulses */}
-        <div className="absolute top-1/4 left-6 sm:left-16 w-64 sm:w-80 h-64 sm:h-80 rounded-full bg-blue-500/20 blur-[100px] hero-pulse-glow" />
-        <div className="absolute top-1/3 right-6 sm:right-16 w-72 sm:w-96 h-72 sm:h-96 rounded-full bg-cyan-400/20 blur-[110px] hero-pulse-glow-alt" />
-        <div className="absolute top-1/2 left-1/3 w-72 sm:w-80 h-72 sm:h-80 rounded-full bg-purple-600/15 blur-[120px] pointer-events-none" />
+        <div className="absolute top-1/4 left-6 sm:left-16 w-64 sm:w-80 h-64 sm:h-80 rounded-full bg-blue-500/25 blur-[90px] hero-pulse-glow" />
+        <div className="absolute top-1/3 right-6 sm:right-16 w-72 sm:w-96 h-72 sm:h-96 rounded-full bg-cyan-400/25 blur-[100px] hero-pulse-glow-alt" />
+        <div className="absolute top-1/2 left-1/3 w-72 sm:w-80 h-72 sm:h-80 rounded-full bg-indigo-500/20 blur-[110px] pointer-events-none" />
 
         {/* Luminous flowing particles */}
         <div className="hero-particle hero-particle-1" />
@@ -90,14 +90,14 @@ export default function HeroSection({ onStartCoding, onExploreFeatures, currentU
 
           <button
             onClick={onExploreFeatures}
-            className="px-7 py-3.5 rounded-xl bg-[#09132E]/80 backdrop-blur-md hover:bg-blue-900/60 border border-blue-700/60 hover:border-blue-400/70 text-slate-100 hover:text-white font-medium text-sm sm:text-base transition-all cursor-pointer shadow-sm"
+            className="px-7 py-3.5 rounded-xl bg-[#0E1F4D]/85 backdrop-blur-md hover:bg-blue-900/60 border border-blue-600/60 hover:border-blue-400/80 text-slate-100 hover:text-white font-medium text-sm sm:text-base transition-all cursor-pointer shadow-sm"
           >
             Explore Features
           </button>
         </div>
 
         {/* Key Capability Highlights Bar */}
-        <div className="mt-12 sm:mt-16 flex flex-wrap items-center justify-center gap-3 sm:gap-6 pt-6 border-t border-blue-900/40 w-full max-w-3xl">
+        <div className="mt-12 sm:mt-16 flex flex-wrap items-center justify-center gap-3 sm:gap-6 pt-6 border-t border-blue-800/40 w-full max-w-3xl">
           {highlights.map((item, idx) => {
             const Icon = item.icon;
             return (
