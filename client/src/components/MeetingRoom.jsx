@@ -457,9 +457,9 @@ export default function MeetingRoom({
   };
 
   return (
-    <div className="min-h-screen bg-[#070B14] text-slate-100 flex flex-col justify-between p-3 sm:p-5 select-none font-sans">
+    <div className="min-h-screen bg-[#0B1739] text-slate-100 flex flex-col justify-between p-3 sm:p-5 select-none font-sans">
       {/* 1. TOP HEADER */}
-      <div className="w-full max-w-6xl mx-auto flex items-center justify-between px-4 py-3 rounded-2xl bg-[#091124] border border-blue-900/40 shadow-[0_0_30px_rgba(14,35,80,0.3)]">
+      <div className="w-full max-w-6xl mx-auto flex items-center justify-between px-4 py-3 rounded-2xl bg-[#0E1F4D] border border-blue-800/40 shadow-[0_0_30px_rgba(37,99,235,0.25)]">
         <div className="flex items-center gap-3">
           <button
             onClick={onReturnToWorkspace}
@@ -492,7 +492,7 @@ export default function MeetingRoom({
         <div className="flex items-center gap-2">
           <button
             onClick={copyMeetingLink}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#0B1630] border border-blue-700/40 hover:border-blue-500/50 text-xs text-slate-300 hover:text-white transition-colors cursor-pointer"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#0B1739] border border-blue-700/40 hover:border-blue-500/50 text-xs text-slate-300 hover:text-white transition-colors cursor-pointer"
           >
             {copiedLink ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5 text-sky-400" />}
             <span className="hidden sm:inline">{copiedLink ? 'Copied' : 'Share Link'}</span>
@@ -530,10 +530,10 @@ export default function MeetingRoom({
         >
           {/* LOCAL USER TILE */}
           <div
-            className={`relative rounded-2xl bg-[#091124] border overflow-hidden flex flex-col items-center justify-center min-h-[240px] sm:min-h-[280px] shadow-[0_0_30px_rgba(14,35,80,0.3)] transition-all ${
+            className={`relative rounded-2xl bg-[#0E1F4D] border overflow-hidden flex flex-col items-center justify-center min-h-[240px] sm:min-h-[280px] shadow-[0_0_30px_rgba(37,99,235,0.25)] transition-all ${
               isSpeakingLocal
                 ? 'border-emerald-400 ring-2 ring-emerald-500/40 shadow-[0_0_25px_rgba(16,185,129,0.3)]'
-                : 'border-blue-900/40'
+                : 'border-blue-800/40'
             }`}
           >
             {cameraActive ? (
@@ -565,7 +565,7 @@ export default function MeetingRoom({
                     </div>
                   )}
                   {isSpeakingLocal && (
-                    <span className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-emerald-400 ring-2 ring-[#091124] animate-pulse"></span>
+                    <span className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-emerald-400 ring-2 ring-[#0E1F4D] animate-pulse"></span>
                   )}
                 </div>
                 <h4 className="mt-3 text-sm font-semibold text-slate-100">
@@ -616,7 +616,7 @@ export default function MeetingRoom({
       </div>
 
       {/* 4. FLOATING CONTROL BAR */}
-      <div className="w-full max-w-md mx-auto mb-2 flex items-center justify-center gap-3 px-5 py-3 rounded-full bg-[#091228]/95 border border-blue-800/50 shadow-[0_0_40px_rgba(14,35,80,0.5)] backdrop-blur-lg">
+      <div className="w-full max-w-md mx-auto mb-2 flex items-center justify-center gap-3 px-5 py-3 rounded-full bg-[#0D1C44]/95 border border-blue-600/50 shadow-[0_0_40px_rgba(37,99,235,0.35)] backdrop-blur-lg">
         {/* Microphone Toggle */}
         <button
           onClick={toggleMic}
@@ -680,10 +680,10 @@ function RemoteParticipantTile({ peer, stream, isSpeaking, connectionState }) {
 
   return (
     <div
-      className={`relative rounded-2xl bg-[#091124] border overflow-hidden flex flex-col items-center justify-center min-h-[240px] sm:min-h-[280px] shadow-[0_0_30px_rgba(14,35,80,0.3)] transition-all ${
+      className={`relative rounded-2xl bg-[#0E1F4D] border overflow-hidden flex flex-col items-center justify-center min-h-[240px] sm:min-h-[280px] shadow-[0_0_30px_rgba(37,99,235,0.25)] transition-all ${
         isSpeaking
           ? 'border-emerald-400 ring-2 ring-emerald-500/40 shadow-[0_0_25px_rgba(16,185,129,0.3)]'
-          : 'border-blue-900/40'
+          : 'border-blue-800/40'
       }`}
     >
       {hasVideoTrack ? (
@@ -714,7 +714,7 @@ function RemoteParticipantTile({ peer, stream, isSpeaking, connectionState }) {
               </div>
             )}
             {isSpeaking && (
-              <span className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-emerald-400 ring-2 ring-[#091124] animate-pulse"></span>
+              <span className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-emerald-400 ring-2 ring-[#0E1F4D] animate-pulse"></span>
             )}
           </div>
           <h4 className="mt-3 text-sm font-semibold text-slate-100">{peer.username}</h4>
