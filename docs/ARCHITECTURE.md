@@ -76,18 +76,19 @@ flowchart TD
 ## 2. Component & Tier Responsibilities
 
 ### Presentation Layer (Client)
-- **Role**: Render user interface, manage reactive state, capture editor input, and direct peer media streams.
+- **Role**: Render user interface, manage reactive state, enforce responsive viewports, capture editor input, and direct peer media streams.
 - **Key Modules**:
-  - `WorkspaceWindow.jsx`: Master IDE layout, tab management, and sidebars.
+  - `LandingNavbar.jsx`: Viewport-aware navigation tier managing spacious desktop layout (`lg:` ≥1024px) and backdrop-blur slide-down drawer for tablet (`768px`) and mobile.
+  - `WorkspaceWindow.jsx`: Master IDE layout, tab management, protected entry gating, and collapsible sidebars.
   - `SyntaxHighlighter.jsx`: Token-based syntax tokenizer and high-contrast colorizer.
   - `MeetingRoom.jsx`: WebRTC peer connection coordinator and audio visualizer.
-  - `AuthModal.jsx`: Google Identity Services dialog handler.
+  - `AuthModal.jsx`: Google Identity Services dialog handler and onboarding flow.
   - `JSZip`: Client-side multi-file ZIP archive compiler.
 
 ### Transport & Application Layer (Server)
-- **Role**: Verify credentials, manage room socket channels, maintain active collaborator presence, and sanitize export payloads.
+- **Role**: Verify credentials, enforce CORS policies, manage room socket channels, maintain active collaborator presence, and sanitize export payloads.
 - **Key Modules**:
-  - `server.js`: HTTP bootstrap, CORS policy, and route aggregation.
+  - `server.js`: HTTP bootstrap, CORS policy whitelist validation (`isOriginAllowed`), and route aggregation.
   - `socket.js`: Socket session lifecycle, room routing, operational sequence tracking, and WebRTC broker.
   - `authRoutes.js`: Cryptographic Google OAuth verification and password hashing.
   - `roomRoutes.js`: File auto-saving, room creation, and sanitized export JSON generation.
@@ -206,6 +207,13 @@ The project export endpoint accepts room names and aggregates stored code files.
 1. File names are stripped of null bytes (`\0`), Windows drive designators (`C:`), and UNC network paths.
 2. Traversal segments (`../` or `..\`) are stripped via regex.
 3. Leading slashes are trimmed, ensuring paths remain strictly relative.
+
+### Strict CORS Policy & Dynamic Origin Whitelisting
+To prevent cross-site request forgery and unauthorized origin embedding:
+1. Server implements dynamic origin assertion via `isOriginAllowed()`.
+2. Authorized origins include `http://localhost:5173`, `http://localhost:4173`, and `https://code-together-weld.vercel.app`.
+3. Preflight `OPTIONS` requests receive validated CORS headers (`Access-Control-Allow-Origin`, `Access-Control-Allow-Methods`, `Access-Control-Allow-Headers`).
+4. Automated regression coverage is enforced through `server/tests/cors.test.js`.
 
 ---
 
