@@ -66,7 +66,7 @@ export default function HowItWorksSection({ onStartCoding }) {
           return (
             <div
               key={index}
-              className={`relative p-7 rounded-2xl bg-gradient-to-b from-[#0A1226] to-[#070D1B] border transition-all duration-300 group flex flex-col justify-between hover:-translate-y-1 ${step.cardClass}`}
+              className={`relative p-7 rounded-2xl bg-gradient-to-b from-[#0E1F4D] to-[#0B1739] border transition-all duration-300 group flex flex-col justify-between hover:-translate-y-1 ${step.cardClass}`}
             >
               <div>
                 <div className="flex items-center justify-between mb-6">
