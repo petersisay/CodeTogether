@@ -7,6 +7,7 @@
 <h3 align="center">Node.js, Express, Socket.IO & MongoDB Atlas Backend Engine</h3>
 
 <p align="center">
+  <b>3C: Code • Collaborate • Connect</b><br />
   The backend service for CodeTogether — managing cryptographic authentication, persistent collaborative rooms, WebSocket synchronization, WebRTC conference signaling, and secure project export packaging.
 </p>
 
@@ -59,7 +60,9 @@ server/
 ├── tests/
 │   ├── auth.test.js                # Google verification & token tests (13 tests)
 │   ├── rooms_api.test.js           # Room authorization & export tests (12 tests)
-│   └── socket_and_webrtc.test.js   # Real-time synchronization & signaling tests (4 tests)
+│   ├── cors.test.js                # CORS policy & origin validation tests (2 tests)
+│   ├── socket_and_webrtc.test.js   # Real-time synchronization & signaling tests (4 tests)
+│   └── google_auth_suite           # OAuth verification & policy enforcement (5 tests)
 ├── .env.example                    # Template for backend environment variables
 ├── package.json                    # Backend dependencies & test scripts
 ├── render.yaml                     # Render Infrastructure-as-Code service definition
@@ -87,6 +90,12 @@ All local passwords are salt-hashed using `bcryptjs` with 10 salt rounds before 
 
 ### 4. JWT Session Tokens
 Successful authentications issue a stateless JSON Web Token signed with `JWT_SECRET` via HMAC-SHA256, carrying `{ id, username, email, avatar }` and expiring in 7 days.
+
+### 5. Strict CORS Policy & Origin Validation
+To guard against cross-origin attacks:
+- The server validates caller origins against an official whitelist (`localhost:5173`, `localhost:4173`, and production `https://code-together-weld.vercel.app`).
+- Dynamic origin verification is covered by automated regression tests in `cors.test.js`.
+- HTTP `OPTIONS` preflight requests receive explicit `Access-Control-Allow-Origin` and `Access-Control-Allow-Headers`.
 
 ---
 
@@ -221,7 +230,7 @@ export function isUserAuthorizedForRoom(room, username) {
 The server uses Node.js's native test runner (`node:test`, `node:assert`) without heavy third-party runners:
 
 ```bash
-# Run all 33 unit and integration tests
+# Run all 36 unit and integration tests
 npm test
 
 # Run micro-benchmark performance tests
