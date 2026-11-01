@@ -251,11 +251,11 @@ export default function AuthModal({
       className="fixed inset-0 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md"
       onClick={(e) => e.target === e.currentTarget && onClose?.()}
     >
-      <div className="w-full max-w-md rounded-2xl bg-[#091124] border border-blue-600/40 shadow-[0_0_50px_rgba(37,99,235,0.4)] overflow-hidden text-left animate-in fade-in zoom-in-95 duration-150">
+      <div className="w-full max-w-md rounded-2xl bg-[#0E1F4D] border border-blue-500/40 shadow-[0_0_50px_rgba(37,99,235,0.4)] overflow-hidden text-left animate-in fade-in zoom-in-95 duration-150">
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-blue-900/40 bg-[#0A142A]">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-blue-800/40 bg-[#12255C]">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg overflow-hidden bg-[#0A1226] border border-blue-500/40 p-0.5 shadow-sm flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg overflow-hidden bg-[#0E1F4D] border border-blue-500/50 p-0.5 shadow-sm flex items-center justify-center">
               <img src="/assets/logo.png" alt="CodeTogether Logo" className="w-full h-full object-contain rounded-md" />
             </div>
             <h3 className="text-base font-bold text-white">
@@ -276,7 +276,7 @@ export default function AuthModal({
 
         {/* Tab Switcher (Visible only when not in post-Google onboarding step) */}
         {!pendingGoogleAuth && (
-          <div className="flex border-b border-blue-900/40 bg-[#070D1B] p-1.5 gap-1.5">
+          <div className="flex border-b border-blue-800/40 bg-[#0B1739] p-1.5 gap-1.5">
             <button
               type="button"
               id="tab-signin"
@@ -361,7 +361,7 @@ export default function AuthModal({
                     value={signupUsername}
                     onChange={(e) => setSignupUsername(e.target.value)}
                     placeholder="e.g. dev_coder"
-                    className="w-full pl-9 pr-3 py-2 rounded-xl bg-[#060B18] border border-blue-900/40 focus:border-blue-500 text-xs text-white placeholder-slate-500 outline-none transition-colors"
+                    className="w-full pl-9 pr-3 py-2 rounded-xl bg-[#0B1739] border border-blue-700/50 focus:border-blue-400 text-xs text-white placeholder-slate-500 outline-none transition-colors"
                   />
                 </div>
                 <p className="text-[10px] text-slate-500 mt-1">
@@ -381,7 +381,7 @@ export default function AuthModal({
                     value={signupPassword}
                     onChange={(e) => setSignupPassword(e.target.value)}
                     placeholder="At least 6 characters (optional)"
-                    className="w-full pl-9 pr-3 py-2 rounded-xl bg-[#060B18] border border-blue-900/40 focus:border-blue-500 text-xs text-white placeholder-slate-500 outline-none transition-colors"
+                    className="w-full pl-9 pr-3 py-2 rounded-xl bg-[#0B1739] border border-blue-700/50 focus:border-blue-400 text-xs text-white placeholder-slate-500 outline-none transition-colors"
                   />
                 </div>
                 <p className="text-[10px] text-slate-500 mt-1">
@@ -417,7 +417,7 @@ export default function AuthModal({
           ) : !isLogin ? (
             /* VIEW B: GOOGLE-ONLY REGISTRATION / SIGN UP */
             <div className="space-y-4 py-1">
-              <div className="p-4 rounded-xl bg-gradient-to-b from-blue-950/40 to-[#070D1B] border border-blue-800/40 text-center space-y-2">
+              <div className="p-4 rounded-xl bg-gradient-to-b from-blue-900/40 to-[#0B1739] border border-blue-800/40 text-center space-y-2">
                 <div className="w-10 h-10 rounded-full bg-blue-900/50 border border-blue-500/40 flex items-center justify-center mx-auto text-sky-400">
                   <ShieldCheck className="w-5 h-5" />
                 </div>
@@ -571,7 +571,7 @@ export default function AuthModal({
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="username or user@gmail.com"
-                      className="w-full pl-9 pr-3 py-2 rounded-xl bg-[#060B18] border border-blue-900/40 focus:border-blue-500 text-xs text-white placeholder-slate-500 outline-none transition-colors"
+                      className="w-full pl-9 pr-3 py-2 rounded-xl bg-[#0B1739] border border-blue-700/50 focus:border-blue-400 text-xs text-white placeholder-slate-500 outline-none transition-colors"
                     />
                   </div>
                 </div>
@@ -589,7 +589,7 @@ export default function AuthModal({
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="Enter your account password"
-                      className="w-full pl-9 pr-3 py-2 rounded-xl bg-[#060B18] border border-blue-900/40 focus:border-blue-500 text-xs text-white placeholder-slate-500 outline-none transition-colors"
+                      className="w-full pl-9 pr-3 py-2 rounded-xl bg-[#0B1739] border border-blue-700/50 focus:border-blue-400 text-xs text-white placeholder-slate-500 outline-none transition-colors"
                     />
                   </div>
                 </div>
