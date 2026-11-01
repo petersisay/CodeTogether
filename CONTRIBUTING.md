@@ -75,9 +75,10 @@ npm run dev:client
 1. **Language & Frameworks**:
    - Modern JavaScript (ES Modules, JSX). **Do not introduce TypeScript**; keep the project consistent in JavaScript.
    - React 19 component hooks (`useState`, `useEffect`, `useRef`, `useCallback`).
-2. **Design Aesthetic**:
+2. **Design Aesthetic & Responsiveness**:
    - Maintain the platform's signature **dark navy & cyber-blue palette** (`#0a0f1d`, `#0f172a`, `#1e293b`).
    - Ensure high contrast and accessibility for code editors and navigation.
+   - Ensure responsive layouts render cleanly without collapsed or crammed elements across desktop (`≥ 1024px`), tablet (`768px`), and mobile viewports (`375px+`).
    - Respect `@media (prefers-reduced-motion)` for all CSS animations.
 3. **Linting**:
    - Run the frontend linter:
@@ -99,6 +100,8 @@ We follow the [Conventional Commits](https://www.conventionalcommits.org/) speci
 - `test:` Adding or updating automated tests
 - `chore:` Dependency bumps, configuration, or build script updates
 
+Commit each file change one by one and push each one to maintain a clear, atomic commit history.
+
 ---
 
 ## Testing & Quality Assurance
@@ -106,11 +109,11 @@ We follow the [Conventional Commits](https://www.conventionalcommits.org/) speci
 Before committing, run the full verification pipeline from the project root:
 
 ```bash
-# Runs backend test suite (33 tests) and client production build
+# Runs backend test suite (36 tests) and client production build
 npm test
 ```
 
-All 33 tests must pass, and the Vite production build must complete with zero errors.
+All 36 tests must pass, and the Vite production build must complete with zero errors.
 
 ---
 
