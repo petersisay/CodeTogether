@@ -449,11 +449,11 @@ export default function WorkspaceWindow({
   const liveCollaborators = Array.isArray(collaborators) ? collaborators : [];
 
   return (
-    <div className="w-full h-screen h-dvh flex flex-col bg-[#070B14] text-slate-100 overflow-hidden text-left select-text">
+    <div className="w-full h-screen h-dvh flex flex-col bg-[#0B1739] text-slate-100 overflow-hidden text-left select-text">
       {/* =========================================================================
           TOP WORKSPACE TOOLBAR (Height: 56px)
          ========================================================================= */}
-      <header className="h-14 bg-[#091124] border-b border-blue-900/40 px-3 sm:px-4 flex items-center justify-between select-none shrink-0 z-20">
+      <header className="h-14 bg-[#0D1C44] border-b border-blue-800/40 px-3 sm:px-4 flex items-center justify-between select-none shrink-0 z-20">
         {/* Left Section: Back to Home + Logo + Room Selector */}
         <div className="flex items-center gap-2 sm:gap-3">
           {onReturnToHome && (
@@ -469,7 +469,7 @@ export default function WorkspaceWindow({
 
           {/* CodeTogether Logo */}
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg overflow-hidden bg-[#0A1226] border border-blue-500/40 p-0.5 flex items-center justify-center">
+            <div className="w-7 h-7 rounded-lg overflow-hidden bg-[#0E1F4D] border border-blue-500/40 p-0.5 flex items-center justify-center">
               <img src="/assets/logo.png" alt="CodeTogether Logo" className="w-full h-full object-contain rounded-md" />
             </div>
             <span className="font-bold text-sm text-white tracking-tight hidden sm:inline">
@@ -481,7 +481,7 @@ export default function WorkspaceWindow({
           <div className="relative">
             <div
               onClick={() => setActiveNav(activeNav === 'Rooms' ? 'Files' : 'Rooms')}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#0C1733] border border-blue-800/40 hover:border-blue-500/50 text-xs text-slate-200 cursor-pointer transition-all"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#0E1F4D] border border-blue-700/50 hover:border-blue-400 text-xs text-slate-200 cursor-pointer transition-all"
             >
               <LayoutGrid className="w-3.5 h-3.5 text-sky-400" />
               <span className="font-semibold">{activeRoom || 'ASTU_DreamTeam'}</span>
@@ -498,7 +498,7 @@ export default function WorkspaceWindow({
 
         {/* Center Section: Active File & Cloud Save Status */}
         <div className="hidden md:flex items-center gap-2.5">
-          <div className="flex items-center gap-2 px-3 py-1 rounded-lg bg-[#081024] border border-blue-900/30 text-xs">
+          <div className="flex items-center gap-2 px-3 py-1 rounded-lg bg-[#0E1F4D] border border-blue-700/40 text-xs">
             <FileCode className="w-3.5 h-3.5 text-sky-400" />
             <span className="font-mono text-slate-200">{activeTab}</span>
           </div>
@@ -566,13 +566,13 @@ export default function WorkspaceWindow({
                     src={collab.avatar}
                     alt={collab.name}
                     title={collab.name}
-                    className="w-6 h-6 rounded-full border border-[#091124] object-cover ring-1 ring-blue-500/40"
+                    className="w-6 h-6 rounded-full border border-[#0D1C44] object-cover ring-1 ring-blue-500/40"
                   />
                 ) : (
                   <div
                     key={collab.id || collab.socketId || i}
                     title={collab.name}
-                    className="w-6 h-6 rounded-full bg-blue-700 border border-[#091124] text-white text-[10px] font-bold flex items-center justify-center ring-1 ring-blue-500/40"
+                    className="w-6 h-6 rounded-full bg-blue-700 border border-[#0D1C44] text-white text-[10px] font-bold flex items-center justify-center ring-1 ring-blue-500/40"
                   >
                     {(collab.name || '?').charAt(0).toUpperCase()}
                   </div>
@@ -623,8 +623,8 @@ export default function WorkspaceWindow({
               </button>
 
               {userMenuOpen && (
-                <div className="absolute right-0 top-full mt-2 w-48 rounded-xl bg-[#091124] border border-blue-900/60 shadow-2xl p-2 z-50 text-left animate-in fade-in zoom-in-95 duration-100">
-                  <div className="px-2.5 py-2 border-b border-blue-950/60 mb-1">
+                <div className="absolute right-0 top-full mt-2 w-48 rounded-xl bg-[#0E1F4D] border border-blue-700/50 shadow-2xl p-2 z-50 text-left animate-in fade-in zoom-in-95 duration-100">
+                  <div className="px-2.5 py-2 border-b border-blue-900/50 mb-1">
                     <p className="text-xs font-semibold text-slate-200 truncate">{currentUser.username}</p>
                     {currentUser.email && (
                       <p className="text-[10px] text-slate-400 truncate">{currentUser.email}</p>
@@ -673,12 +673,12 @@ export default function WorkspaceWindow({
           className={`
             ${showLeftSidebar ? 'w-64 sm:w-72' : 'w-0 overflow-hidden'}
             ${mobileTab === 'files' ? 'flex w-full absolute inset-0 z-30' : 'hidden lg:flex'}
-            bg-[#080F22] border-r border-blue-900/40 flex-col justify-between shrink-0 transition-all duration-200
+            bg-[#0C193E] border-r border-blue-800/40 flex-col justify-between shrink-0 transition-all duration-200
           `}
         >
           <div className="flex-1 flex flex-col overflow-y-auto p-3 space-y-4">
             {/* Primary Nav Switcher */}
-            <div className="flex bg-[#060B18] p-1 rounded-xl border border-blue-900/30 gap-1">
+            <div className="flex bg-[#0B1739] p-1 rounded-xl border border-blue-700/40 gap-1">
               <button
                 onClick={() => setActiveNav('Files')}
                 className={`flex-1 py-1.5 rounded-lg text-xs font-medium flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
@@ -834,11 +834,11 @@ export default function WorkspaceWindow({
         <main
           className={`
             ${mobileTab !== 'editor' ? 'hidden lg:flex' : 'flex'}
-            flex-1 flex-col bg-[#050914] min-w-0 h-full overflow-hidden
+            flex-1 flex-col bg-[#08122E] min-w-0 h-full overflow-hidden
           `}
         >
           {/* File Tabs Bar */}
-          <div className="h-10 bg-[#070D1A] border-b border-blue-900/40 px-3 flex items-center gap-1.5 overflow-x-auto select-none shrink-0">
+          <div className="h-10 bg-[#0C1A40] border-b border-blue-800/40 px-3 flex items-center gap-1.5 overflow-x-auto select-none shrink-0">
             {Object.keys(files).length > 0 ? (
               Object.keys(files).map((tab) => {
                 const isActive = activeTab === tab;
@@ -848,7 +848,7 @@ export default function WorkspaceWindow({
                     onClick={() => handleTabSelect(tab)}
                     className={`group flex items-center gap-2 px-3 py-1.5 rounded-t-lg text-xs font-mono cursor-pointer transition-all ${
                       isActive
-                        ? 'bg-[#050914] text-sky-300 border-t-2 border-sky-400 font-semibold'
+                        ? 'bg-[#08122E] text-sky-300 border-t-2 border-sky-400 font-semibold'
                         : 'text-slate-400 hover:text-slate-200 hover:bg-blue-950/20'
                     }`}
                   >
@@ -926,7 +926,7 @@ export default function WorkspaceWindow({
           className={`
             ${showRightSidebar ? 'w-72 sm:w-80' : 'w-0 overflow-hidden'}
             ${mobileTab === 'chat' ? 'flex w-full absolute inset-0 z-30' : 'hidden lg:flex'}
-            bg-[#080F22] border-l border-blue-900/40 flex-col justify-between shrink-0 transition-all duration-200
+            bg-[#0C193E] border-l border-blue-800/40 flex-col justify-between shrink-0 transition-all duration-200
           `}
         >
           {/* Active Collaborators Section */}
@@ -946,7 +946,7 @@ export default function WorkspaceWindow({
                 liveCollaborators.map((user, idx) => (
                   <div
                     key={user.id || user.socketId || `${user.name}-${idx}`}
-                    className="flex items-center justify-between p-2 rounded-xl bg-[#0A142A] border border-blue-900/30 text-xs"
+                    className="flex items-center justify-between p-2 rounded-xl bg-[#0E1F4D] border border-blue-700/40 text-xs"
                   >
                     <div className="flex items-center gap-2 truncate">
                       <div className="relative">
@@ -962,7 +962,7 @@ export default function WorkspaceWindow({
                           </div>
                         )}
                         <span
-                          className={`absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full ${user.statusColor || 'bg-emerald-400'} ring-1 ring-[#080F22]`}
+                          className={`absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full ${user.statusColor || 'bg-emerald-400'} ring-1 ring-[#0C193E]`}
                         ></span>
                       </div>
                       <div className="text-left leading-tight truncate">
@@ -1013,7 +1013,7 @@ export default function WorkspaceWindow({
                         <span className="font-semibold text-slate-200 text-xs">{msg.sender}</span>
                         <span className="text-[9px] text-slate-400">{msg.time}</span>
                       </div>
-                      <p className="text-xs text-slate-300 bg-[#0C1733] p-2 rounded-xl border border-blue-900/40 inline-block leading-relaxed break-words max-w-full">
+                      <p className="text-xs text-slate-300 bg-[#0E1F4D] p-2 rounded-xl border border-blue-700/40 inline-block leading-relaxed break-words max-w-full">
                         {msg.text}
                       </p>
                     </div>
@@ -1036,7 +1036,7 @@ export default function WorkspaceWindow({
                 placeholder="Type a message to team..."
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
-                className="flex-1 bg-[#060B18] border border-blue-900/50 focus:border-blue-500 rounded-xl px-3 py-2 text-xs text-slate-200 placeholder-slate-500 outline-none transition-colors"
+                className="flex-1 bg-[#0B1739] border border-blue-700/50 focus:border-blue-400 rounded-xl px-3 py-2 text-xs text-slate-200 placeholder-slate-500 outline-none transition-colors"
               />
               <button
                 type="submit"
@@ -1053,7 +1053,7 @@ export default function WorkspaceWindow({
       {/* =========================================================================
           MOBILE VIEW TAB SWITCHER (Visible only on screens < 1024px)
          ========================================================================= */}
-      <div className="lg:hidden h-12 bg-[#091124] border-t border-blue-900/40 flex items-center justify-around px-2 select-none shrink-0 z-40">
+      <div className="lg:hidden h-12 bg-[#0D1C44] border-t border-blue-800/40 flex items-center justify-around px-2 select-none shrink-0 z-40">
         <button
           onClick={() => setMobileTab('editor')}
           className={`flex items-center gap-1.5 py-1.5 px-3 rounded-xl text-xs font-semibold cursor-pointer ${
@@ -1109,8 +1109,8 @@ export default function WorkspaceWindow({
       {/* Export Success & IDE Instructions Modal */}
       {exportModalData && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-in fade-in duration-150">
-          <div className="bg-[#091124] border border-blue-600/40 rounded-2xl p-5 sm:p-6 max-w-md w-full shadow-2xl text-left relative">
-            <div className="flex items-center gap-3 mb-4 pb-3 border-b border-blue-900/40">
+          <div className="bg-[#0E1F4D] border border-blue-500/40 rounded-2xl p-5 sm:p-6 max-w-md w-full shadow-2xl text-left relative">
+            <div className="flex items-center gap-3 mb-4 pb-3 border-b border-blue-800/40">
               <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shrink-0">
                 <FolderArchive className="w-5 h-5" />
               </div>
@@ -1121,7 +1121,7 @@ export default function WorkspaceWindow({
             </div>
 
             <div className="space-y-3 text-xs text-slate-300 mb-5 leading-relaxed">
-              <div className="p-3.5 rounded-xl bg-[#060B18] border border-blue-900/40 space-y-2">
+              <div className="p-3.5 rounded-xl bg-[#0B1739] border border-blue-700/40 space-y-2">
                 <div className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">How to Open in VS Code</div>
                 <ol className="list-decimal list-inside space-y-1 text-slate-300">
                   <li>Extract the downloaded <span className="font-mono text-sky-300 font-semibold">{exportModalData.filename}</span> file on your machine.</li>
@@ -1152,7 +1152,7 @@ export default function WorkspaceWindow({
       {/* Export Error Alert Modal */}
       {exportError && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-in fade-in duration-150">
-          <div className="bg-[#091124] border border-red-500/40 rounded-2xl p-5 sm:p-6 max-w-sm w-full shadow-2xl text-left">
+          <div className="bg-[#0E1F4D] border border-red-500/40 rounded-2xl p-5 sm:p-6 max-w-sm w-full shadow-2xl text-left">
             <div className="flex items-center gap-3 mb-3 text-red-400">
               <AlertTriangle className="w-5 h-5 shrink-0" />
               <h3 className="text-sm font-bold text-white">Project Export Failed</h3>
