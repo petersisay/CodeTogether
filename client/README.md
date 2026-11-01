@@ -7,7 +7,8 @@
 <h3 align="center">Real-Time Collaborative Web Client (React 19 + Vite 8)</h3>
 
 <p align="center">
-  The frontend client for CodeTogether — a high-performance, single-page application providing real-time code editing, peer-to-peer WebRTC video/voice meetings, Google authentication, and instant project ZIP export.
+  <b>3C: Code • Collaborate • Connect</b><br />
+  The frontend client for CodeTogether — a high-performance, single-page application providing real-time code editing, peer-to-peer WebRTC video/voice meetings, Google authentication, responsive navigation drawers, and instant project ZIP export.
 </p>
 
 ---
@@ -15,6 +16,7 @@
 ## 📑 Table of Contents
 - [Overview](#overview)
 - [Component Hierarchy](#component-hierarchy)
+- [Responsive Breakpoints & Navigation Architecture](#responsive-breakpoints--navigation-architecture)
 - [Tech Stack & Dependencies](#tech-stack--dependencies)
 - [Real-Time Collaboration Architecture](#real-time-collaboration-architecture)
 - [WebRTC Voice & Video System](#webrtc-voice--video-system)
@@ -30,8 +32,8 @@
 ## Overview
 
 The CodeTogether client is engineered for responsiveness, low-latency live interactions, and developer productivity. It operates in two primary modes:
-1. **Developer Landing Page (`/`)**: A futuristic showcase featuring an animated WebP cyber-mesh hero background, feature tours, team narrative, interactive IDE previews, and authentication modals.
-2. **Interactive Workspace (`/workspace`)**: A full-screen pair programming environment with tabbed file navigation, live socket code synchronization, team chat, dynamic user presence, WebRTC calling, and offline project export.
+1. **Developer Landing Page (`/`)**: A futuristic showcase featuring an animated WebP cyber-mesh hero background, '3C Code • Collaborate • Connect' brand identity, responsive tablet/mobile drawer navigation, interactive IDE previews, and authentication modals.
+2. **Interactive Workspace (`/workspace`)**: A full-screen pair programming environment with tabbed file navigation, live socket code synchronization, team chat, dynamic user presence, WebRTC calling, and offline project export. Protected by authentication checks.
 3. **Dedicated Meeting Room (`/meeting/:meetingId`)**: Focused audio/video conferencing with peer visualizers, camera/mic toggling, and room sharing.
 
 ---
@@ -44,14 +46,14 @@ client/src/
 ├── App.jsx                        # Client-side router & global session coordinator
 ├── index.css                      # Global styles, Tailwind CSS v4, custom utility classes & animations
 └── components/
-    ├── LandingNavbar.jsx          # Sticky navigation bar with auth triggers & brand logo
-    ├── HeroSection.jsx            # Animated hero with WebP background, glow pulses & particles
+    ├── LandingNavbar.jsx          # Responsive sticky navbar with desktop (lg:) & glassmorphic tablet drawer
+    ├── HeroSection.jsx            # Animated hero with '3C Code • Collaborate • Connect', WebP background & pulses
     ├── FeaturesSection.jsx        # 6-card platform capabilities grid
-    ├── AboutSection.jsx           # ASTU university developer team narrative & illustration
+    ├── AboutSection.jsx           # Developer team narrative & illustration
     ├── HowItWorksSection.jsx      # 3-step numbered workflow guide
     ├── TechSection.jsx            # Production technology stack badges
     ├── CtaSection.jsx             # High-converting bottom CTA banner
-    ├── LandingFooter.jsx          # Platform footer, legal, and GitHub link
+    ├── LandingFooter.jsx          # Streamlined platform footer with section anchors
     ├── WorkspaceWindow.jsx        # Full-screen collaborative IDE layout
     │   ├── Left Sidebar           # Room selector & project file explorer (create/delete)
     │   ├── Center Editor          # Tabbed file navigation, line numbers & SyntaxHighlighter
@@ -62,6 +64,23 @@ client/src/
     ├── CreateFileModal.jsx        # Modal to create files with dynamic extension detection
     └── SyntaxHighlighter.jsx      # Token-based high-contrast syntax highlighting engine
 ```
+
+---
+
+## Responsive Breakpoints & Navigation Architecture
+
+CodeTogether implements a tailored responsive architecture engineered to prevent visual clutter across viewports:
+
+1. **Desktop Viewport (`lg:` & `xl:` ≥ 1024px)**:
+   - Full horizontal navigation bar displaying brand identity, section anchors (`Features`, `About`, `How It Works`, `Tech Stack`), and a dedicated `Workspace (Live)` pill button.
+   - Generous spacing (`gap-6 xl:gap-8`) with right-side action triggers for Sign In, Sign Up, and Launch Workspace.
+2. **Tablet Viewport (`sm:` to `lg:`, 640px – 1023px, including 768px)**:
+   - Eliminates element overcrowding by moving center links into an accessible slide-down drawer.
+   - Top header maintains clean breathing room (~460px consumed width out of 768px), displaying the brand logo, Sign In button, Launch Workspace button, and the hamburger toggle.
+3. **Mobile Viewport (`< 640px`)**:
+   - Streamlined header with compact brand icon and quick action buttons.
+4. **Glassmorphic Navigation Drawer**:
+   - Tapping the hamburger button (`#btn-mobile-menu`) slides down an animated backdrop-blur drawer with section anchors, live workspace link, user session card or Sign In/Sign Up buttons, and a prominent Launch Workspace CTA.
 
 ---
 
