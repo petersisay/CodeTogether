@@ -2,10 +2,10 @@
 
 @layer base {
   :root {
-    --bg-dark: #070B14;
-    --card-dark: #0A1124;
-    --border-blue: #1E3A8A;
-    --accent-blue: #2563EB;
+    --bg-dark: #0B1739;
+    --card-dark: #0E1F4D;
+    --border-blue: #2563EB;
+    --accent-blue: #3B82F6;
     --accent-cyan: #38BDF8;
     --accent-indigo: #6366F1;
     --accent-purple: #8B5CF6;
@@ -13,7 +13,7 @@
   }
 
   body {
-    background-color: #070B14;
+    background-color: #0B1739;
     color: #F1F5F9;
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
     overflow-x: hidden;
@@ -35,16 +35,16 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: #080D1A;
+  background: #0B1739;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #1E293B;
+  background: #1E3A8A;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #334155;
+  background: #2563EB;
 }
 
 /* Combined Color Palette Utilities */
@@ -61,14 +61,14 @@
 }
 
 .gradient-card-combined {
-  background: linear-gradient(180deg, rgba(14, 22, 44, 0.85) 0%, rgba(7, 12, 24, 0.95) 100%);
-  border: 1px solid rgba(99, 102, 241, 0.25);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  background: linear-gradient(180deg, rgba(14, 31, 77, 0.9) 0%, rgba(11, 23, 57, 0.95) 100%);
+  border: 1px solid rgba(59, 130, 246, 0.35);
+  box-shadow: 0 8px 32px 0 rgba(7, 15, 38, 0.45);
 }
 
 .gradient-card-combined:hover {
-  border-color: rgba(56, 189, 248, 0.45);
-  box-shadow: 0 10px 40px -5px rgba(99, 102, 241, 0.25), 0 0 20px -3px rgba(56, 189, 248, 0.2);
+  border-color: rgba(56, 189, 248, 0.55);
+  box-shadow: 0 10px 40px -5px rgba(59, 130, 246, 0.35), 0 0 20px -3px rgba(56, 189, 248, 0.3);
 }
 
 .glow-combined {
