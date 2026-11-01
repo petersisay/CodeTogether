@@ -10,13 +10,13 @@ export default function LandingFooter({ onNavigateToWorkspace }) {
   };
 
   return (
-    <footer className="w-full bg-[#050914] border-t border-blue-900/40 pt-14 pb-10 text-left text-xs text-slate-400">
+    <footer className="w-full bg-[#09132F] border-t border-blue-800/40 pt-14 pb-10 text-left text-xs text-slate-400">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-10 pb-12 border-b border-blue-900/30">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-10 pb-12 border-b border-blue-800/30">
           {/* Brand & Narrative (Col 1-5) */}
           <div className="md:col-span-5 space-y-3.5">
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg overflow-hidden bg-[#0A1226] border border-blue-500/40 p-0.5 shadow-sm flex items-center justify-center">
+              <div className="w-8 h-8 rounded-lg overflow-hidden bg-[#0E1F4D] border border-blue-500/50 p-0.5 shadow-sm flex items-center justify-center">
                 <img src="/assets/logo.png" alt="CodeTogether Logo" className="w-full h-full object-contain rounded-md" />
               </div>
               <span className="font-bold text-base tracking-tight text-white flex items-center">
