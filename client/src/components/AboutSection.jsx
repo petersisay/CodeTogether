@@ -45,7 +45,7 @@ export default function AboutSection() {
           {/* 4 Feature Checklist Items */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
             {points.map((point, index) => (
-              <div key={index} className="p-4 rounded-xl bg-gradient-to-b from-[#0B152C] to-[#070E1E] border border-indigo-900/40 hover:border-indigo-500/50 transition-all space-y-1.5 shadow-sm">
+              <div key={index} className="p-4 rounded-xl bg-gradient-to-b from-[#0E1F4D] to-[#0B1739] border border-blue-700/40 hover:border-blue-500/60 transition-all space-y-1.5 shadow-sm">
                 <div className="flex items-center gap-2 text-sky-300 font-semibold text-xs sm:text-sm">
                   <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-400" />
                   <span>{point.title}</span>
@@ -65,7 +65,7 @@ export default function AboutSection() {
             <div className="absolute -inset-3 bg-gradient-to-r from-blue-600/40 via-indigo-600/35 to-purple-500/30 rounded-3xl blur-2xl opacity-80"></div>
 
             {/* Illustration Frame */}
-            <div className="relative rounded-2xl overflow-hidden border border-indigo-500/40 bg-gradient-to-b from-[#0C1530]/90 to-[#070D1B]/95 p-2 shadow-[0_0_50px_rgba(99,102,241,0.25)]">
+            <div className="relative rounded-2xl overflow-hidden border border-indigo-500/40 bg-gradient-to-b from-[#0E1F4D]/95 to-[#0B1739]/95 p-2 shadow-[0_0_50px_rgba(99,102,241,0.25)]">
               <img
                 src="/assets/team-illustration.png"
                 alt="CodeTogether collaborative development team"
@@ -73,12 +73,12 @@ export default function AboutSection() {
               />
 
               {/* Floating Pill Badges */}
-              <div className="absolute top-5 right-5 px-3 py-1.5 rounded-xl bg-[#070D1B]/95 border border-cyan-500/40 backdrop-blur-md text-[11px] font-bold text-cyan-300 shadow-xl flex items-center gap-1.5">
+              <div className="absolute top-5 right-5 px-3 py-1.5 rounded-xl bg-[#0E1F4D]/95 border border-cyan-500/40 backdrop-blur-md text-[11px] font-bold text-cyan-300 shadow-xl flex items-center gap-1.5">
                 <Code2 className="w-3.5 h-3.5 text-cyan-400" />
                 <span>Concurrent Pair Coding</span>
               </div>
 
-              <div className="absolute bottom-5 left-5 px-3 py-1.5 rounded-xl bg-[#070D1B]/95 border border-purple-500/40 backdrop-blur-md text-[11px] font-bold text-purple-300 shadow-xl flex items-center gap-1.5">
+              <div className="absolute bottom-5 left-5 px-3 py-1.5 rounded-xl bg-[#0E1F4D]/95 border border-purple-500/40 backdrop-blur-md text-[11px] font-bold text-purple-300 shadow-xl flex items-center gap-1.5">
                 <Globe2 className="w-3.5 h-3.5 text-emerald-400" />
                 <span>WebRTC P2P Voice & Video</span>
               </div>
