@@ -44,7 +44,7 @@ export default function KeyFeatures() {
   ];
 
   return (
-    <div className="h-full rounded-2xl bg-[#091124] border border-blue-900/40 p-5 flex flex-col text-left shadow-[0_4px_20px_rgba(7,11,20,0.5)]">
+    <div className="h-full rounded-2xl bg-[#0E1F4D] border border-blue-700/40 p-5 flex flex-col text-left shadow-[0_4px_20px_rgba(11,23,57,0.5)]">
       {/* Section Header */}
       <div className="flex items-center gap-2.5 mb-4">
         <div className="w-8 h-8 rounded-lg bg-blue-950/80 border border-blue-500/40 flex items-center justify-center text-sky-400">
@@ -60,7 +60,7 @@ export default function KeyFeatures() {
           return (
             <div
               key={idx}
-              className="p-3 rounded-xl bg-[#080E1D] border border-blue-950/70 hover:border-blue-700/50 transition-all flex items-start gap-3 group"
+              className="p-3 rounded-xl bg-[#0B1739] border border-blue-800/40 hover:border-blue-500/60 transition-all flex items-start gap-3 group"
             >
               <div className="w-8 h-8 rounded-lg bg-blue-950/60 border border-blue-800/40 flex items-center justify-center text-sky-400 shrink-0 group-hover:text-cyan-300 transition-colors">
                 <Icon className="w-4 h-4" />
