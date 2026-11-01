@@ -163,7 +163,7 @@ export default function App() {
     const mode = urlParams.get('mode') === 'audio' ? 'audio' : 'video';
 
     return (
-      <div className="min-h-screen bg-[#070B14]">
+      <div className="min-h-screen bg-[#0B1739]">
         <MeetingRoom
           meetingId={meetingId}
           initialMode={mode}
@@ -186,7 +186,7 @@ export default function App() {
   if (currentPath.startsWith('/workspace')) {
     if (!currentUser) {
       return (
-        <div className="min-h-screen bg-[#070B14] flex flex-col items-center justify-center p-4">
+        <div className="min-h-screen bg-[#0B1739] flex flex-col items-center justify-center p-4">
           <AuthModal
             isOpen={true}
             initialMode="login"
@@ -197,7 +197,7 @@ export default function App() {
       );
     }
     return (
-      <div className="h-screen h-dvh w-full bg-[#070B14] overflow-hidden">
+      <div className="h-screen h-dvh w-full bg-[#0B1739] overflow-hidden">
         <WorkspaceWindow
           activeRoom={activeRoom}
           setActiveRoom={setActiveRoom}
@@ -221,12 +221,13 @@ export default function App() {
 
   // Route 3: Modern, Spacious, Professional Landing Page (/)
   return (
-    <div className="min-h-screen bg-[#070B14] text-slate-100 flex flex-col justify-between selection:bg-blue-600/40 relative">
-      {/* Background radial ambient glow effects */}
+    <div className="min-h-screen bg-[#0B1739] text-slate-100 flex flex-col justify-between selection:bg-blue-600/40 relative">
+      {/* Background radial ambient glow effects matching Tech Blue aesthetic */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
-        <div className="absolute -top-40 left-1/4 w-[700px] h-[700px] bg-blue-600/10 rounded-full blur-[160px]"></div>
-        <div className="absolute top-1/2 -right-40 w-[600px] h-[600px] bg-cyan-600/8 rounded-full blur-[160px]"></div>
-        <div className="absolute -bottom-40 left-1/3 w-[700px] h-[700px] bg-blue-700/8 rounded-full blur-[160px]"></div>
+        <div className="absolute -top-40 left-1/4 w-[750px] h-[750px] bg-blue-600/18 rounded-full blur-[160px]"></div>
+        <div className="absolute top-1/3 -right-40 w-[650px] h-[650px] bg-cyan-500/15 rounded-full blur-[170px]"></div>
+        <div className="absolute top-2/3 -left-32 w-[600px] h-[600px] bg-indigo-600/16 rounded-full blur-[160px]"></div>
+        <div className="absolute -bottom-40 left-1/3 w-[750px] h-[750px] bg-blue-500/14 rounded-full blur-[160px]"></div>
       </div>
 
       <div className="relative z-10 flex flex-col min-h-screen">
