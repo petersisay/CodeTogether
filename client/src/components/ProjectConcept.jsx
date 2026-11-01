@@ -3,7 +3,7 @@ import { Lightbulb, Check, UserCheck } from 'lucide-react';
 
 export default function ProjectConcept() {
   return (
-    <div className="h-full rounded-2xl bg-[#091124] border border-blue-900/40 p-5 flex flex-col justify-between text-left shadow-[0_4px_20px_rgba(7,11,20,0.5)]">
+    <div className="h-full rounded-2xl bg-[#0E1F4D] border border-blue-700/40 p-5 flex flex-col justify-between text-left shadow-[0_4px_20px_rgba(11,23,57,0.5)]">
       <div>
         {/* Section Header */}
         <div className="flex items-center gap-2.5 mb-3.5">
@@ -45,8 +45,8 @@ export default function ProjectConcept() {
       </div>
 
       {/* Quote Badge */}
-      <div className="mt-5 pt-3 border-t border-blue-950/60">
-        <div className="w-full py-2 px-3 rounded-xl bg-blue-950/30 border border-blue-800/30 text-center">
+      <div className="mt-5 pt-3 border-t border-blue-800/40">
+        <div className="w-full py-2 px-3 rounded-xl bg-[#0B1739] border border-blue-700/40 text-center">
           <span className="text-xs font-medium italic text-sky-300">
             “Great ideas are built together.”
           </span>
