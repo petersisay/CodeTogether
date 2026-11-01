@@ -86,7 +86,7 @@ export default function TechStack() {
   ];
 
   return (
-    <div className="w-full rounded-2xl bg-[#091124] border border-blue-900/40 p-4 flex flex-col text-left shadow-[0_4px_20px_rgba(7,11,20,0.5)]">
+    <div className="w-full rounded-2xl bg-[#0E1F4D] border border-blue-700/40 p-4 flex flex-col text-left shadow-[0_4px_20px_rgba(11,23,57,0.5)]">
       {/* Header */}
       <div className="flex items-center gap-2.5 mb-3">
         <div className="w-7 h-7 rounded-lg bg-blue-950/80 border border-blue-500/40 flex items-center justify-center text-sky-400">
@@ -100,7 +100,7 @@ export default function TechStack() {
         {stack.map((item) => (
           <div
             key={item.name}
-            className="flex flex-col items-center justify-center p-2 rounded-xl bg-[#080E1D] border border-blue-950/60 hover:border-blue-700/40 transition-all text-center group"
+            className="flex flex-col items-center justify-center p-2 rounded-xl bg-[#0B1739] border border-blue-800/40 hover:border-blue-500/60 transition-all text-center group"
           >
             <div className="w-8 h-8 flex items-center justify-center mb-1 group-hover:scale-110 transition-transform">
               {item.icon}
