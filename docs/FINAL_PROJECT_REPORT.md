@@ -55,9 +55,13 @@ This document serves as the formal handoff report confirming that the platform h
    - 1-click unpack and run workflow in VS Code (`code .`).
 
 6. **Landing Page & Developer Experience**
+   - Brand identity refreshed around the **"3C: Code • Collaborate • Connect"** principle and official brand asset logo.
    - Modern dark navy/blue aesthetic with high-contrast text and glowing accents.
    - Optimized animated hero background featuring glowing developer illustrations and ambient floating particles.
-   - Responsive multi-device layout spanning desktop (1440px+), laptop (1024px), tablet (768px), and mobile (375px+).
+   - Responsive multi-device layout spanning desktop (≥1024px), tablet (768px), and mobile (375px+).
+   - Viewport-engineered navigation tier: eliminates tablet header crowding at 768px by shifting center navigation links into a glassmorphic slide-down drawer.
+   - Protected workspace access gate: direct launches from the landing page verify user authentication and route guests through the Google login modal.
+   - Streamlined, distraction-free footer with essential navigation anchors and live workspace status.
    - Interactive modal previews for authentication, room creation, and file manipulation.
 
 ---
@@ -66,11 +70,11 @@ This document serves as the formal handoff report confirming that the platform h
 
 | Layer | Technologies / Libraries | Purpose & Configuration |
 | :--- | :--- | :--- |
-| **Frontend Framework** | React 18, Vite 8, JavaScript (ES6+ / JSX) | Fast SPA rendering, component modularity, instant HMR |
-| **Client Routing & State** | React State / Context Hooks, Vanilla CSS | Reactive UI state, dark navy design tokens, zero heavy CSS frameworks |
+| **Frontend Framework** | React 19, Vite 8, JavaScript (ES6+ / JSX) | Fast SPA rendering, component modularity, instant HMR |
+| **Client Routing & Styling** | React State / Context Hooks, Tailwind CSS v4 | Reactive UI state, dark navy design tokens, responsive breakpoints |
 | **Real-time Signaling** | Socket.IO Client 4.8 | Bidirectional event transport for editor synchronization and chat |
 | **WebRTC Media** | Browser `RTCPeerConnection`, Google STUN | Direct peer-to-peer audio and video transmission |
-| **Client Bundling & Export** | JSZip, FileSaver | Client-side archive construction and zero-dependency download |
+| **Client Bundling & Export** | JSZip | Client-side archive construction and zero-dependency download |
 | **Backend Framework** | Node.js (v20+), Express 4 | REST API routing, JSON payloads, static serving |
 | **WebSocket Engine** | Socket.IO 4.8 | Rooms, broadcast channels, presence tracking, meeting rooms |
 | **Database & ODM** | MongoDB Atlas, Mongoose 8 | Multi-document persistence for users, rooms, files, and chat messages |
