@@ -36,14 +36,14 @@ export default function LandingNavbar({
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-[#070B14]/85 backdrop-blur-xl border-b border-blue-900/30 transition-all">
+    <header className="sticky top-0 z-50 w-full bg-[#0B1739]/85 backdrop-blur-xl border-b border-blue-700/35 transition-all">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         {/* Brand Logo */}
         <a
           href="/"
           className="flex items-center gap-2.5 group cursor-pointer"
         >
-          <div className="w-10 h-10 rounded-xl overflow-hidden bg-[#0A1226] border border-blue-500/40 p-0.5 shadow-[0_0_20px_rgba(56,189,248,0.35)] transition-transform group-hover:scale-105 flex items-center justify-center">
+          <div className="w-10 h-10 rounded-xl overflow-hidden bg-[#0E1F4D] border border-blue-500/50 p-0.5 shadow-[0_0_20px_rgba(56,189,248,0.35)] transition-transform group-hover:scale-105 flex items-center justify-center">
             <img
               src="/assets/logo.png"
               alt="CodeTogether Logo"
@@ -108,8 +108,8 @@ export default function LandingNavbar({
               </button>
 
               {userDropdownOpen && (
-                <div className="absolute right-0 top-full mt-2 w-52 rounded-xl bg-[#091124] border border-blue-900/60 shadow-2xl p-2 z-50 text-left animate-in fade-in zoom-in-95 duration-100">
-                  <div className="px-3 py-2 border-b border-blue-950/60 mb-1">
+                <div className="absolute right-0 top-full mt-2 w-52 rounded-xl bg-[#0E1F4D] border border-blue-600/50 shadow-2xl p-2 z-50 text-left animate-in fade-in zoom-in-95 duration-100">
+                  <div className="px-3 py-2 border-b border-blue-900/40 mb-1">
                     <p className="text-xs font-semibold text-slate-200 truncate">{currentUser.username}</p>
                     {currentUser.email && (
                       <p className="text-[10px] text-slate-400 truncate">{currentUser.email}</p>
@@ -190,8 +190,8 @@ export default function LandingNavbar({
               </button>
 
               {userDropdownOpen && (
-                <div className="absolute right-0 top-full mt-2 w-48 rounded-xl bg-[#091124] border border-blue-900/60 shadow-2xl p-2 z-50 text-left">
-                  <div className="px-3 py-1.5 border-b border-blue-950/60 mb-1">
+                <div className="absolute right-0 top-full mt-2 w-48 rounded-xl bg-[#0E1F4D] border border-blue-600/50 shadow-2xl p-2 z-50 text-left">
+                  <div className="px-3 py-1.5 border-b border-blue-900/40 mb-1">
                     <p className="text-xs font-semibold text-slate-200 truncate">{currentUser.username}</p>
                   </div>
                   <button
@@ -248,7 +248,7 @@ export default function LandingNavbar({
 
       {/* Mobile & Tablet Drawer (Visible below lg / 1024px) */}
       {mobileMenuOpen && (
-        <div className="lg:hidden border-t border-blue-900/40 bg-[#070B14]/98 backdrop-blur-2xl px-5 py-5 space-y-4 text-left shadow-2xl animate-in slide-in-from-top-2 duration-150">
+        <div className="lg:hidden border-t border-blue-700/40 bg-[#0B1739]/98 backdrop-blur-2xl px-5 py-5 space-y-4 text-left shadow-2xl animate-in slide-in-from-top-2 duration-150">
           <div className="space-y-1">
             <p className="px-3 text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-2">Navigation</p>
             {navLinks.map((link) => (
