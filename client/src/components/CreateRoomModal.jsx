@@ -48,8 +48,8 @@ export default function CreateRoomModal({ isOpen, onClose, onRoomCreated }) {
 
   return (
     <div style={{ zIndex: 9999 }} className="fixed inset-0 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
-      <div className="w-full max-w-sm rounded-2xl bg-[#091124] border border-blue-600/40 shadow-[0_0_50px_rgba(37,99,235,0.4)] overflow-hidden text-left">
-        <div className="flex items-center justify-between px-5 py-4 border-b border-blue-900/40 bg-[#0A142A]">
+      <div className="w-full max-w-sm rounded-2xl bg-[#0E1F4D] border border-blue-500/40 shadow-[0_0_50px_rgba(37,99,235,0.4)] overflow-hidden text-left">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-blue-800/40 bg-[#12255C]">
           <div className="flex items-center gap-2">
             <FolderPlus className="w-4 h-4 text-sky-400" />
             <h3 className="text-sm font-bold text-white">Create Project Room</h3>
@@ -77,7 +77,7 @@ export default function CreateRoomModal({ isOpen, onClose, onRoomCreated }) {
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g. Mobile_App_Project"
-              className="w-full px-3 py-1.5 rounded-xl bg-[#060B18] border border-blue-900/40 focus:border-blue-500 text-xs text-white placeholder-slate-500 outline-none"
+              className="w-full px-3 py-1.5 rounded-xl bg-[#0B1739] border border-blue-700/50 focus:border-blue-400 text-xs text-white placeholder-slate-500 outline-none"
             />
           </div>
 
@@ -88,7 +88,7 @@ export default function CreateRoomModal({ isOpen, onClose, onRoomCreated }) {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="e.g. Next.js & React Native workspace"
-              className="w-full px-3 py-1.5 rounded-xl bg-[#060B18] border border-blue-900/40 focus:border-blue-500 text-xs text-white placeholder-slate-500 outline-none"
+              className="w-full px-3 py-1.5 rounded-xl bg-[#0B1739] border border-blue-700/50 focus:border-blue-400 text-xs text-white placeholder-slate-500 outline-none"
             />
           </div>
 
@@ -96,7 +96,7 @@ export default function CreateRoomModal({ isOpen, onClose, onRoomCreated }) {
             <button
               type="button"
               onClick={onClose}
-              className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs cursor-pointer"
+              className="px-3 py-1.5 rounded-xl bg-[#0B1739] hover:bg-[#12255C] border border-blue-700/40 text-slate-300 text-xs cursor-pointer"
             >
               Cancel
             </button>
