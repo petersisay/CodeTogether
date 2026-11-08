@@ -293,39 +293,6 @@ npm run build --prefix client
 
 ---
 
-## 🚀 Deployment Guide
-
-### 1. Database — MongoDB Atlas
-1. Create a cluster on [MongoDB Atlas](https://www.mongodb.com/atlas).
-2. Configure a database user with read/write access.
-3. Allow network access (`0.0.0.0/0` for cloud deployment).
-4. Copy your connection string into `MONGODB_URI`.
-
-### 2. Backend — Render
-1. Connect your repository to Render as a **Web Service**.
-2. Settings:
-   - **Root Directory**: `server`
-   - **Build Command**: `npm install`
-   - **Start Command**: `npm start`
-3. Environment Variables:
-   - `PORT`: `5000`
-   - `NODE_ENV`: `production`
-   - `MONGODB_URI`: `<your_atlas_connection_string>`
-   - `JWT_SECRET`: `<secure_32_character_random_secret>`
-   - `CLIENT_URL`: `https://code-together-weld.vercel.app`
-   - `GOOGLE_CLIENT_ID`: `764795198689-41h522pnno7r3ifmb6im3iu12418m31f.apps.googleusercontent.com`
-
-### 3. Frontend — Vercel
-1. Import the repository into Vercel.
-2. Settings:
-   - **Root Directory**: `client`
-   - **Build Command**: `npm run build`
-   - **Output Directory**: `dist`
-3. Environment Variables:
-   - `VITE_BACKEND_URL`: `https://codetogether-v1fo.onrender.com`
-   - `VITE_GOOGLE_CLIENT_ID`: `764795198689-41h522pnno7r3ifmb6im3iu12418m31f.apps.googleusercontent.com`
-4. Direct routes (e.g. `/workspace`, `/meeting/:meetingId`) are automatically rewritten to `/index.html` via `client/vercel.json`.
-
 ### 4. Google Cloud Console Configuration
 1. Open [Google Cloud Console](https://console.cloud.google.com/apis/credentials).
 2. Select your OAuth 2.0 Web Client.
