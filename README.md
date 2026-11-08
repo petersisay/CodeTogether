@@ -293,15 +293,6 @@ npm run build --prefix client
 
 ---
 
-### 4. Google Cloud Console Configuration
-1. Open [Google Cloud Console](https://console.cloud.google.com/apis/credentials).
-2. Select your OAuth 2.0 Web Client.
-3. Add **Authorized JavaScript origins**:
-   - `https://code-together-weld.vercel.app`
-   - `http://localhost:5173` (for local development)
-
----
-
 ## 💻 Local Development Setup
 
 ```bash
