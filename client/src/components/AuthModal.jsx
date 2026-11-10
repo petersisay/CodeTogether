@@ -24,7 +24,21 @@ export default function AuthModal({
 
   const defaultBackend = import.meta.env.DEV ? 'http://localhost:5000' : 'https://codetogether-v1fo.onrender.com';
   const backendUrl = import.meta.env.VITE_BACKEND_URL || defaultBackend;
-  const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
+  const [googleClientId, setGoogleClientId] = useState(import.meta.env.VITE_GOOGLE_CLIENT_ID || '');
+
+  // Fetch backend auth config if client ID was not statically bundled
+  useEffect(() => {
+    if (!googleClientId) {
+      fetch(`${backendUrl}/api/auth/config`)
+        .then((res) => (res.ok ? res.json() : null))
+        .then((data) => {
+          if (data && data.googleClientId) {
+            setGoogleClientId(data.googleClientId);
+          }
+        })
+        .catch(() => {});
+    }
+  }, [backendUrl, googleClientId]);
 
   // Synchronize initial mode when modal opens
   useEffect(() => {
@@ -161,6 +175,9 @@ export default function AuthModal({
     const setupGoogle = () => {
       attempts++;
       if (!googleClientId) {
+        if (attempts < 20) {
+          timerId = setTimeout(setupGoogle, 300);
+        }
         return;
       }
       if (window.google?.accounts?.id && googleBtnRef.current) {
@@ -185,7 +202,7 @@ export default function AuthModal({
         } catch (e) {
           console.warn('[GIS Setup Notice]:', e);
         }
-      } else if (attempts < 15) {
+      } else if (attempts < 25) {
         timerId = setTimeout(setupGoogle, 250);
       }
     };
@@ -196,6 +213,38 @@ export default function AuthModal({
       if (timerId) clearTimeout(timerId);
     };
   }, [isOpen, googleClientId, isLogin, pendingGoogleAuth]);
+
+  // Handle click on the fallback Google button
+  const handleFallbackGoogleClick = () => {
+    setError('');
+    if (!googleClientId) {
+      setError(
+        'Google Sign-In is not configured yet for this deployment (missing VITE_GOOGLE_CLIENT_ID). Please configure it in your Vercel/Render settings, or sign in with your password below.'
+      );
+      return;
+    }
+
+    if (window.google?.accounts?.id) {
+      try {
+        window.google.accounts.id.initialize({
+          client_id: googleClientId,
+          callback: handleGoogleCredentialResponse,
+          auto_select: false,
+        });
+        window.google.accounts.id.prompt((notification) => {
+          if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+            setError(
+              'Google One Tap prompt could not be displayed by your browser (third-party cookies disabled or prompt dismissed). Please sign in with username/password below.'
+            );
+          }
+        });
+      } catch (err) {
+        setError('Google Sign-In initialization error: ' + (err.message || 'Unknown error'));
+      }
+    } else {
+      setError('Connecting to Google Identity Services... Please check your internet connection and try again.');
+    }
+  };
 
   // Handle Returning User Password Sign-In
   const handleLoginSubmit = async (e) => {
@@ -447,13 +496,7 @@ export default function AuthModal({
                       <button
                         type="button"
                         id="btn-google-signup"
-                        onClick={() => {
-                          if (window.google?.accounts?.id) {
-                            window.google.accounts.id.prompt();
-                          } else {
-                            setError('Connecting to Google Identity Services...');
-                          }
-                        }}
+                        onClick={handleFallbackGoogleClick}
                         className="w-full py-2.5 px-4 rounded-full bg-white hover:bg-slate-100 text-slate-800 font-semibold text-xs flex items-center justify-center gap-2 shadow transition-all cursor-pointer"
                       >
                         <svg className="w-4 h-4" viewBox="0 0 24 24">
@@ -514,13 +557,7 @@ export default function AuthModal({
                       <button
                         type="button"
                         id="btn-google-signin"
-                        onClick={() => {
-                          if (window.google?.accounts?.id) {
-                            window.google.accounts.id.prompt();
-                          } else {
-                            setError('Connecting to Google Identity Services...');
-                          }
-                        }}
+                        onClick={handleFallbackGoogleClick}
                         className="w-full py-2.5 px-4 rounded-full bg-white hover:bg-slate-100 text-slate-800 font-semibold text-xs flex items-center justify-center gap-2 shadow transition-all cursor-pointer"
                       >
                         <svg className="w-4 h-4" viewBox="0 0 24 24">
