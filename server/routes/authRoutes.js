@@ -113,13 +113,6 @@ export async function validateGoogleCredential(credential) {
   return { payload, googleId, email, displayName, avatar };
 }
 
-// Public auth configuration (exposes public OAuth client ID if configured)
-router.get('/config', (req, res) => {
-  res.json({
-    googleClientId: process.env.GOOGLE_CLIENT_ID || '',
-  });
-});
-
 // 1. GOOGLE VERIFY ENDPOINT (Checks if account exists, returns user profile or prompts for username)
 router.post('/google/verify', async (req, res) => {
   try {
