@@ -199,7 +199,7 @@ Create a `.env` file in `client/` using [`client/.env.example`](file:///c:/Users
 VITE_BACKEND_URL=https://codetogether-v1fo.onrender.com
 
 # Google Identity Services Client ID
-VITE_GOOGLE_CLIENT_ID=your-google-client-id.apps.googleusercontent.com
+VITE_GOOGLE_CLIENT_ID=764795198689-41h522pnno7r3ifmb6im3iu12418m31f.apps.googleusercontent.com
 ```
 
 ---
