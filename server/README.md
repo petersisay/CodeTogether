@@ -254,7 +254,7 @@ NODE_ENV=production
 CLIENT_URL=https://code-together-weld.vercel.app
 MONGODB_URI=mongodb+srv://<username>:<password>@cluster0.mongodb.net/codetogether?retryWrites=true&w=majority
 JWT_SECRET=your_super_secret_jwt_key_at_least_32_characters_long
-GOOGLE_CLIENT_ID=764795198689-41h522pnno7r3ifmb6im3iu12418m31f.apps.googleusercontent.com
+GOOGLE_CLIENT_ID=your-google-client-id.apps.googleusercontent.com
 ```
 
 ---

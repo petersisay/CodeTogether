@@ -313,7 +313,7 @@ npm run build --prefix client
    - `MONGODB_URI`: `<your_atlas_connection_string>`
    - `JWT_SECRET`: `<secure_32_character_random_secret>`
    - `CLIENT_URL`: `https://code-together-weld.vercel.app`
-   - `GOOGLE_CLIENT_ID`: `764795198689-41h522pnno7r3ifmb6im3iu12418m31f.apps.googleusercontent.com`
+   - `GOOGLE_CLIENT_ID`: `<your_google_client_id>.apps.googleusercontent.com`
 
 ### 3. Frontend — Vercel
 1. Import the repository into Vercel.
@@ -323,7 +323,7 @@ npm run build --prefix client
    - **Output Directory**: `dist`
 3. Environment Variables:
    - `VITE_BACKEND_URL`: `https://codetogether-v1fo.onrender.com`
-   - `VITE_GOOGLE_CLIENT_ID`: `764795198689-41h522pnno7r3ifmb6im3iu12418m31f.apps.googleusercontent.com`
+   - `VITE_GOOGLE_CLIENT_ID`: `<your_google_client_id>.apps.googleusercontent.com`
 4. Direct routes (e.g. `/workspace`, `/meeting/:meetingId`) are automatically rewritten to `/index.html` via `client/vercel.json`.
 
 ### 4. Google Cloud Console Configuration

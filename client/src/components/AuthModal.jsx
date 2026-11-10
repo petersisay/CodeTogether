@@ -24,9 +24,7 @@ export default function AuthModal({
 
   const defaultBackend = import.meta.env.DEV ? 'http://localhost:5000' : 'https://codetogether-v1fo.onrender.com';
   const backendUrl = import.meta.env.VITE_BACKEND_URL || defaultBackend;
-  const googleClientId =
-    import.meta.env.VITE_GOOGLE_CLIENT_ID ||
-    '764795198689-41h522pnno7r3ifmb6im3iu12418m31f.apps.googleusercontent.com';
+  const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
 
   // Synchronize initial mode when modal opens
   useEffect(() => {
@@ -162,6 +160,9 @@ export default function AuthModal({
 
     const setupGoogle = () => {
       attempts++;
+      if (!googleClientId) {
+        return;
+      }
       if (window.google?.accounts?.id && googleBtnRef.current) {
         try {
           window.google.accounts.id.initialize({
