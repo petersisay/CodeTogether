@@ -293,6 +293,7 @@ npm run build --prefix client
 
 ---
 
+<<<<<<< HEAD
 ## 🚀 Deployment Guide
 
 ### 1. Database — MongoDB Atlas
@@ -335,6 +336,8 @@ npm run build --prefix client
 
 ---
 
+=======
+>>>>>>> 79ef8dfb6f571b650107a309e097101324d89eab
 ## 💻 Local Development Setup
 
 ```bash
