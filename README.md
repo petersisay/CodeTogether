@@ -220,8 +220,7 @@ CodeTogether/
 │   ├── package.json
 │   └── vercel.json                     # SPA client-side rewrite rules
 ├── server/
-│   ├── config/
-│   │   └── db.js                       # MongoDB Atlas connection lifecycle
+│   ├── db.js                           # MongoDB Atlas connection lifecycle & events
 │   ├── middleware/
 │   │   └── auth.js                     # JWT authorization middleware
 │   ├── models/
@@ -238,7 +237,7 @@ CodeTogether/
 │   │   ├── cors.test.js                # CORS policy & origin validation tests (2 tests)
 │   │   ├── socket_and_webrtc.test.js   # Real-time synchronization & signaling tests (4 tests)
 │   │   └── google_auth_suite           # OAuth verification & policy enforcement (5 tests)
-│   ├── index.js                        # Server entrypoint
+│   ├── server.js                       # Primary server entrypoint, middleware & Socket.IO initialization
 │   └── package.json
 ├── docs/
 │   ├── images/                         # Showcase screenshots for documentation
@@ -295,18 +294,45 @@ npm run build --prefix client
 
 ## 💻 Local Development Setup
 
+### 1. Clone & Install
 ```bash
-# 1. Clone the repository
+# Clone the repository
 git clone https://github.com/petersisay/CodeTogether.git
 cd CodeTogether
 
-# 2. Install all dependencies
+# Install all workspace dependencies (root, server, and client)
 npm run install:all
+```
 
-# 3. Start backend server (port 5000)
+### 2. Configure Environment Variables
+Create the local environment files from the provided templates:
+
+```bash
+# Server environment configuration (.env)
+cp server/.env.example server/.env
+
+# Client environment configuration (.env)
+cp client/.env.example client/.env
+```
+
+Key environment configurations:
+- **`server/.env`**:
+  - `PORT=5000` (Backend API & WebSocket server port)
+  - `MONGODB_URI` (MongoDB Atlas connection string)
+  - `JWT_SECRET` (Cryptographic key for signing session tokens)
+  - `CLIENT_URL=http://localhost:5173` (Whitelisted frontend origin for CORS and Socket.IO)
+  - `GOOGLE_CLIENT_ID` (Google OAuth 2.0 Web Client ID)
+  - `STUN_SERVER=stun:stun.l.google.com:19302` (Public WebRTC STUN relay)
+- **`client/.env`**:
+  - `VITE_BACKEND_URL=http://localhost:5000` (API & Socket.IO backend endpoint)
+  - `VITE_GOOGLE_CLIENT_ID` (Google OAuth 2.0 Client ID for frontend GIS modal)
+
+### 3. Run Development Servers
+```bash
+# Start backend server with auto-reload (port 5000)
 npm run dev:server
 
-# 4. Start frontend development server (port 5173)
+# In a separate terminal, start frontend Vite dev server (port 5173)
 npm run dev:client
 ```
 
