@@ -42,8 +42,7 @@ The server operates as a unified HTTP REST API and WebSocket daemon running on N
 
 ```
 server/
-├── config/
-│   └── db.js                       # MongoDB Atlas Mongoose connection lifecycle & events
+├── db.js                           # MongoDB Atlas Mongoose connection lifecycle & events
 ├── middleware/
 │   └── auth.js                     # JWT validation middleware (authenticateToken, verifyToken)
 ├── models/
